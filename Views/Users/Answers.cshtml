@@ -1,0 +1,129 @@
+﻿@model QuizWebApp.ViewModels.AnswersViewModel
+
+@{
+    ViewData["Title"] = "Odpovede";
+}
+
+<h2>Zoznam odpovedí</h2>
+<br />
+<form>
+    <div class="form-group row">
+
+        <div class="col">
+            @Html.DropDownListFor(a => a.selectedContestId, new SelectList(Model.contestList, "Id", "Name", 1), "Zvoľte súťaž",
+            new
+            {
+                @class = "form-control selectpicker",
+                data_live_search = "true",
+                data_live_search_style = "startsWith",
+                data_live_search_normalize = "true"
+            })
+        </div>
+
+        <div class="col">
+            @Html.DropDownListFor(a => a.selectedUserId, new SelectList(Model.userList, "Id", "Email", 1), "Zvoľte užívateľa",
+            new
+            {
+                @class = "form-control selectpicker",
+                data_live_search = "true",
+                data_live_search_style = "startsWith",
+                data_live_search_normalize = "true"
+            })
+        </div>
+
+        <div class="col">
+            <input asp-action="FilterAnswers" type="submit" value="Filtrovať" class="btn btn-light" formmethod="post" />
+        </div>
+        <div class="col-auto">
+            <input asp-action="OnPostExport" type="submit" value="Exportovať ako xlsx" class="btn btn-success" formmethod="post"
+                   onclick="return confirm('Naozaj si prajete exportovať zoznam do excelu ?')" />
+        </div>
+    </div>
+</form>
+
+<form>
+    <table id="dataTable" class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Súťaž
+                </th>
+                <th>
+                    Otázka
+                </th>
+                <th class="text-center">
+                    Správne
+                </th>
+                <th>
+
+                </th>
+            </tr>
+
+        </thead>
+        <tbody class="bg-white">
+            @for (int i = 0; i < Model.contestQuestionUsers.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @(i + 1)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(a => a.contestQuestionUsers[i].ApplicationUser.Email)
+                    </td>
+                    <td>
+                        @if (Model.contestQuestionUsers[i].ContestQuestion.Contest.isActive)
+                        {
+                            <span class="text-success">@Html.DisplayFor(a => a.contestQuestionUsers[i].ContestQuestion.Contest.Name)</span>
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(a => a.contestQuestionUsers[i].ContestQuestion.Contest.Name)
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(a => a.contestQuestionUsers[i].ContestQuestion.Question.Name)
+                    </td>
+                    <td class="text-center">
+                        @(Model.contestQuestionUsers[i].IsAnsweredCorrectly ? "Áno" : "Nie")
+                    </td>
+                    <td class="text-center">
+                        <input asp-action="FilterAnswers" asp-route-answerToDelete="@i" type="submit" value="X" class="btn btn-dark" formmethod="post"
+                               onclick="return confirm('Naozaj chcete odstrániť odpoveď ?')" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @Html.HiddenFor(a => a.selectedUserId)
+    @Html.HiddenFor(a => a.selectedContestId)
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable({
+            "language": {
+                "lengthMenu": "Zobraz _MENU_ záznamov na stranu",
+                "zeroRecords": "Nenašli sa žiadne záznamy",
+                "info": "Strana _PAGE_ z _PAGES_",
+                "infoEmpty": "Žiadne dostupné záznamy",
+                "infoFiltered": "",
+                "search": "Hľadať",
+                "paginate": {
+                    "first": "Prvá",
+                    "last": "Posledná",
+                    "next": "Nasledujúca",
+                    "previous": "Predchádzajúca"
+                }
+            },
+            "ordering": false
+        });
+    });
+</script>
+

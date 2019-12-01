@@ -1,0 +1,84 @@
+﻿@model QuizWebApp.Models.Question
+
+@{
+    ViewData["Title"] = "Zobraziť";
+}
+
+<h4>Otázka #cislo</h4>
+<br />
+
+<div class="questionBody">
+    <div class="row justify-content-start questionDiv">
+        <div class="col-auto my-auto question-font">
+            @Html.Raw(Model.Text)
+        </div>
+        <div class="col-auto my-auto">
+            @if (Model.Image != null)
+            {
+                <img src="~/uploads/images/@Model.Image" class="img-fluid" width="300">
+            }
+        </div>
+    </div>
+    <hr />
+
+    @for (var i = 0; i < Model.Answers.Count; i++)
+    {
+        <div class="row answerDiv" id="@i" onclick="divClick(this)" data-assigned-id="@i">
+            <div class="col-1 col-sm-1 my-auto text-center">
+                <input type="radio" id="radio@(i)" name="UserAnswer" value="@i" class="big-radio" />
+            </div>
+
+            @if (Model.Answers[i].Text == null)
+            {
+                <div class="col-4 col-sm-4 answerDivImg my-auto">
+                    <img src="~/uploads/images/@Model.Answers[i].Image" class="img-fluid cold-auto my-auto" width="200">
+                </div>
+            }
+            else
+            {
+                @if (Model.Answers[i].Image == null)
+                {
+                    <div class="col-10 col-sm-10 my-auto">
+                        @Html.DisplayFor(model => model.Answers[i].Text)
+                    </div>
+                }
+                else
+                {
+                    <div class="col-7 col-sm-7 my-auto">
+                        @Html.DisplayFor(model => model.Answers[i].Text)
+                    </div>
+
+                    <div class="col-4 col-sm-4 answerDivImg my-auto">
+                        <img src="~/uploads/images/@Model.Answers[i].Image" class="img-fluid cold-auto my-auto" width="200">
+                    </div>
+                }
+            }
+
+        </div>
+        <br />
+    }
+
+    @Html.HiddenFor(a => a.Id)
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script>
+    function divClick(elem) {
+        var id = $(elem).data('assigned-id');
+
+        var divs = document.getElementsByClassName("answerDiv");
+        var len =  divs.length;
+
+        for(var i=0 ; i<len; i++){
+           divs[i].style.backgroundColor="white";
+        }
+
+        document.getElementById(id).style.backgroundColor = "#e1e5ea";
+
+        document.getElementById("radio" + id).checked = true;
+    }
+</script>

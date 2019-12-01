@@ -1,0 +1,44 @@
+﻿@model QuizWebApp.ViewModels.QuestionDeleteViewModel
+@{
+    ViewData["Title"] = "Chyba pri vymazaní";
+}
+
+<h3>Vyskytla sa chyba pri pokuse o vymazanie otázky</h3>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <span class="text-danger font-weight-bold">Nepodarilo sa vymazať nasledovnú otázku:</span>
+        </div>
+        <div class="form-group">
+            @Html.TextBoxFor(a => a.QuestionName, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+        <div class="form-group">
+            @Html.TextAreaFor(a => a.QuestionText, new { id = "mytextarea" })
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <h4>Záznam s touto otázkou existuje v súťaži:</h4>
+        </div>
+
+        @foreach (var item in Model.ContestQuestions)
+        {
+            <div class="form-group">
+                <span class="text-danger">@item.Contest.Name</span>
+            </div>
+        }
+
+    </div>
+</div>
+
+<script>
+    tinymce.init({
+        selector: '#mytextarea',
+        readonly : 1
+    });
+</script>

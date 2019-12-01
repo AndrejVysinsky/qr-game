@@ -1,0 +1,43 @@
+﻿@model QuizWebApp.Models.Contest
+
+@{
+    ViewData["Title"] = "Zobraziť";
+}
+
+
+<div class="form-bg">
+
+    <h4>Súťaž</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group border border-light bg-light myDivMain">
+        @Html.DisplayFor(a => a.Name, new { @class = "form-control" })
+    </div>
+
+    <hr />
+    <div class="form-group">
+        <h5>@Html.LabelFor(a => a.ContestQuestions)</h5>
+    </div>
+
+    @for (var i = 0; i < Model.ContestQuestions.Count; i++)
+    {
+        <div class="form-group border border-light bg-light myDiv">
+            <div class="form-row">
+                <div class="col-1 my-auto font-weight-bold" align="center">
+                    @("#" + (i + 1))
+                </div>
+                <div class="col my-auto">
+                    @Html.DisplayFor(a => a.ContestQuestions[i].Question.Name, new { @class = "form-control" })
+                </div>
+                <div class="col-3 my-auto">
+                    <a asp-action="QuestionForm" asp-controller="Users" asp-route-id="@Model.ContestQuestions[i].Id" class="btn btn-light">Zobraziť otázku</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        <a asp-action="Index">Späť na zoznam</a>
+    </div>
+
+</div>

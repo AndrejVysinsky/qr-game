@@ -1,0 +1,39 @@
+﻿@model QuizWebApp.Models.Contest
+@{
+    ViewData["Title"] = "Chyba pri vymazaní";
+}
+
+<h3>Vyskytla sa chyba pri pokuse o vymazanie súťaže</h3>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <span class="text-danger font-weight-bold">Nepodarilo sa vymazať nasledovnú súťaž:</span>
+        </div>
+        <div class="form-group">
+            @Html.TextBoxFor(a => a.Name, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <h4>Dôvod:</h4>
+        </div>
+
+        <div class="form-group">
+            <span class="text-danger">Pre jednu alebo viac otázok súťaže existujú záznamy o odpovediach.</span>
+        </div>
+
+        <form>
+            @Html.HiddenFor(a => a.Id)
+            <div class="form-group">
+                <input asp-action="DeleteUserAnswers" type="submit" class="btn btn-danger" value="Vymazať záznamy" formmethod="post"
+                       onclick="return confirm('Naozaj chcete vymazať odpovede používateľov pre túto súťaž ?')"/>
+            </div>
+        </form>
+
+    </div>
+</div>

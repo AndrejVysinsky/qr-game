@@ -1,0 +1,82 @@
+﻿@model List<QuizWebApp.Models.Contest>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Zoznam súťaží</h2>
+<br />
+<p>
+    <a asp-action="Create" class="btn btn-light">Vytvoriť novú sútaž</a>
+</p>
+<table id="dataTable" class="table table-striped table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                Názov súťaže
+            </th>
+            <th class="text-center">
+                Akcie
+            </th>
+            <th class="text-center">
+                Stav
+            </th>
+            <th class="text-center">
+                QR
+            </th>
+        </tr>
+
+    </thead>
+    <tbody class="bg-white">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@(i+1)</td>
+                <td>@Html.DisplayFor(modelItem => Model[i].Name)</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@Model[i].Id">Upraviť</a> |
+                    <a asp-action="Details" asp-route-id="@Model[i].Id">Zobraziť</a> |
+                    <a asp-action="Delete" asp-route-id="@Model[i].Id">Vymazať</a>
+                </td>
+                <td class="text-center">
+                    @if (Model[i].isActive)
+                    {
+                        <a asp-action="Activate" asp-route-id="@Model[i].Id" class="text-success font-weight-bold">Súťaž je aktívna</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Activate" asp-route-id="@Model[i].Id" class="text-danger">Súťaž je neaktívna</a>
+                    }
+                </td>
+                <td class="text-center">
+                    <a asp-action="GenerateQRCodes" asp-route-id="@Model[i].Id" target="_blank">Vygenerovať QR kódy</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable({
+            "language": {
+                "lengthMenu": "Zobraz _MENU_ záznamov na stranu",
+                "zeroRecords": "Nenašli sa žiadne záznamy",
+                "info": "Strana _PAGE_ z _PAGES_",
+                "infoEmpty": "Žiadne dostupné záznamy",
+                "infoFiltered": "",
+                "search": "Hľadať",
+                "paginate": {
+                    "first": "Prvá",
+                    "last": "Posledná",
+                    "next": "Nasledujúca",
+                    "previous": "Predchádzajúca"
+                }
+            },
+            "ordering": false
+        });
+    });
+</script>

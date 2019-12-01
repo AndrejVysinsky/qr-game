@@ -1,0 +1,216 @@
+﻿@model QuizWebApp.Models.Question
+
+@{
+    ViewData["Title"] = "Vytvoriť";
+}
+
+<div class="form-bg">
+
+    <h4>Vytvorenie otázky</h4>
+    <hr />
+    <form asp-action="UploadImage" asp-route-editing="false" id="myForm" method="post" runat="server" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col-5">
+                @Html.LabelFor(a => a.Name, new { @class = "font-weight-bold" })
+                @Html.TextBoxFor(a => a.Name, new { @class = "form-control", id = "questionName" })
+                <span id="questionNameValidation" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            @Html.LabelFor(a => a.Text, new { @class = "font-weight-bold" })
+            @Html.TextAreaFor(a => a.Text, new { id = "mytextarea" })
+            <span id="textAreaValidation" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-4 my-auto">
+                @Html.HiddenFor(a => a.Image)
+                <input type="file" name="qImage" class="form-control-file" />
+            </div>
+
+            @if (Model.Image != null)
+            {
+                <div class="col-2 my-auto">
+                    <img src="~/uploads/temps/@Model.Image" width="100" class="img-thumbnail img-fluid">
+                </div>
+                <div class="col-1 my-auto">
+                    <input asp-action="RemoveImage" asp-route-img="@Model.Image" asp-route-editing="false" type="submit" value="X" class="btn btn-dark" formmethod="post"
+                           onclick="return confirm('Naozaj chcete odstrániť obrázok ?')" />
+                </div>
+            }
+
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <h5>@Html.LabelFor(a => a.Answers, new { @class = "font-weight-bold" })</h5>
+        </div>
+
+        <div class="form-group">
+            <div class="form-row">
+                <div class="col-1"></div>
+                <div class="col-7 my-auto">
+                    <span class="font-weight-bold">Text a obrázok odpovede</span>
+                    @*Html.LabelFor(a => a.Answers[0].Text, new { @class = "font-weight-bold" })*@
+                </div>
+                <div class="col my-auto">
+                    @*Html.LabelFor(a => a.Answers[0].Image, new { @class = "font-weight-bold" })*@
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            @for (var i = 0; i < Model.Answers.Count; i++)
+            {
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="col-1 my-auto">
+                            <input type="radio" name="IsCorrect" value="@i" class="big-radio" checked="checked" />
+                        </div>
+                        <div class="col-7 my-auto">
+                            @Html.TextBoxFor(a => a.Answers[i].Text, new { @class = "form-control answerText" })
+                            <span id="answerTextValidation@(i)" class="text-danger"></span>
+                        </div>
+                        @if (Model.Answers[i].Image != null)
+                        {
+                            <div class="col-1 my-auto">
+                                <img src="~/uploads/temps/@Model.Answers[i].Image" width="50" class="img-thumbnail img-fluid" id="answerImage@(i)">
+                            </div>
+                            <div class="col-1 my-auto">
+                                <input asp-action="RemoveImage" asp-route-img="@Model.Answers[i].Image" asp-route-editing="false" type="submit" value="X" class="btn btn-dark" formmethod="post"
+                                       onclick="return confirm('Naozaj chcete odstrániť obrázok ?')" />
+                            </div>
+                        }
+                        <div class="col my-auto">
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-1 my-auto"></div>
+                        <div class="col-7 my-auto">
+                            <input type="file" name="@i" class="form-control-file" />
+                        </div>
+                    </div>
+                    @Html.HiddenFor(a => a.Answers[i].Image)
+                </div>
+            }
+
+        </div>
+
+        <div class="form-group">
+            <input asp-action="AddAnswer" asp-route-editing="false" type="submit" value="Pridať odpoveď" class="btn btn-light" formmethod="post" />
+            @if (Model.Answers.Count > 2)
+            {
+                <input asp-action="RemoveAnswer" asp-route-editing="false" type="submit" value="Odobrať odpoveď" class="btn btn-outline-dark" formmethod="post"
+                       onclick="return confirm('Naozaj chcete odobrať odpoveď ?')" />
+            }
+        </div>
+
+        <div class="form-group">
+            <input asp-action="Create" type="submit" value="Vytvoriť" class="btn btn-primary" formmethod="post" onclick="return validate();" />
+        </div>
+
+    </form>
+
+    <div>
+        <a asp-action="Index">Späť na zoznam</a>
+    </div>
+
+</div>
+
+<script>
+    tinymce.init({
+        selector: '#mytextarea',
+        init_instance_callback: function (editor) {
+            editor.on('Change', function (e) {
+
+                var content = $.trim(editor.getContent({ format: 'text' }));
+
+                if (content.length == 0)
+                {
+                    $('#textAreaValidation').text("Otázka musí mať vyplnený text.");
+                }
+                else
+                {
+                    $('#textAreaValidation').text("");
+                }
+            });
+        }
+    });
+
+    $('input[type=file]').change(function () {
+
+        $('#myForm').submit();
+
+    });
+
+    $("#questionName").change(function () {
+
+        if ($.trim($(this).val()).length == 0)
+        {
+            $('#questionNameValidation').text("Otázka musí mať názov.");
+        }
+        else
+        {
+            $('#questionNameValidation').text("");
+        }
+
+    });
+
+    $(".answerText").change(function () {
+        let answerDiv = $(this).parent().parent().parent();
+        let index = $(this).parent().parent().parent().parent().children();
+        index = index.index(answerDiv);
+
+        if ($.trim($(this).val()).length > 0 || $('#answerImage' + index).length > 0)
+        {
+            $('#answerTextValidation' + index).text("");
+        }
+        else
+        {
+            $('#answerTextValidation' + index).text("Odpoveď musí mať text alebo obrázok.");
+        }
+    });
+        
+
+    function validate()
+    {
+        var isValid = true;
+
+        var editorContent = $.trim(tinyMCE.get('mytextarea').getContent({ format: 'text' }));
+        if (editorContent.length == 0)
+        {
+            $('#textAreaValidation').text("Otázka musí mať vyplnený text.");
+            isValid = false;
+        }
+
+        if ($.trim($("#questionName").val()).length == 0)
+        {
+            $('#questionNameValidation').text("Otázka musí mať názov.");
+            isValid = false;  
+        }        
+
+        var i = 0;
+        $(".answerText").each(function () {
+
+            if ($.trim($(this).val()).length == 0 && $('#answerImage' + i).length == 0)
+            {
+                $('#answerTextValidation' + i).text("Odpoveď musí mať text alebo obrázok.");
+                isValid = false;
+            }
+            i++;
+
+        });
+
+        if (isValid == false) {
+            alert("Vyplňte prosím všetky požadované polia.");
+        }
+
+        return isValid;
+    }
+    
+</script>

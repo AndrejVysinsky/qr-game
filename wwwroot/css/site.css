@@ -1,0 +1,180 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    background-image: url(../uploads/bg/background.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+.my-auto {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.big-radio {
+    margin-top:8px;
+    width: 18px;
+    height: 18px;
+}
+
+.big-checkbox {
+    margin-top: 8px;
+    width: 18px;
+    height: 18px;
+}
+
+.question-font {
+    font-size: 18px;
+}
+
+@media print {
+
+    * {-webkit-print-color-adjust:exact;}
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        background-image : none;
+    }
+
+    .phoneImg {
+        background-image: url(../uploads/bg/phoneImg.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+    }
+
+    .printBtn {
+        display: none;
+    }
+}
+
+#printable {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#innerPrintable {
+    padding: 200px;
+    padding-top: 300px;
+    padding-bottom: 300px;
+}
+
+.myDiv {
+    padding: 7px;
+    border-radius: 10px;
+}
+
+.myDivMain {
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.questionDiv {
+    border: 1px solid lightgrey;
+    border-radius: 15px;
+    padding: 30px;
+    background-color:white;
+}
+
+.answerDiv {
+    border: 1px solid lightgrey;
+    border-radius: 20px;
+    padding: 15px;
+    background-color: white;
+}
+
+.answerDivImg {
+    justify-content: right;
+}
+
+.questionBody {
+    margin: 5px;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.form-bg {
+    background: rgba(255, 255, 255,1);
+    padding-left: 40px;
+    padding-right: 40px;
+    border-left: 2px solid lightgrey;
+    border-right: 2px solid lightgrey;
+}
+
+

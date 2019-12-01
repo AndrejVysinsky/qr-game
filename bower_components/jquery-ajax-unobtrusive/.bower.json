@@ -1,0 +1,15 @@
+{
+  "name": "jquery-ajax-unobtrusive",
+  "homepage": "https://github.com/aspnet/jquery-ajax-unobtrusive",
+  "version": "3.2.6",
+  "_release": "3.2.6",
+  "_resolution": {
+    "type": "version",
+    "tag": "v3.2.6",
+    "commit": "dd69746ae0771e3f4232a6852210b8c17718e782"
+  },
+  "_source": "https://github.com/aspnet/jquery-ajax-unobtrusive.git",
+  "_target": "v3.2.6",
+  "_originalSource": "jquery-ajax-unobtrusive",
+  "_direct": true
+}

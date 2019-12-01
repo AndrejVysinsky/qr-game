@@ -1,0 +1,24 @@
+﻿@model QuizWebApp.Models.Contest
+
+@{
+    ViewData["Title"] = "Vymazať";
+}
+
+<h3>Naozaj chcete vymazať túto súťaž ?</h3>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            @Html.TextBoxFor(a => a.Name, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Vymazať" class="btn btn-danger" /> |
+            <a asp-action="Index">Späť na zoznam</a>
+        </form>
+    </div>
+</div>

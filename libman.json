@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootstrap-select@1.13.11",
+      "destination": "wwwroot/bootstrap-select/",
+      "files": [
+        "js/bootstrap-select.min.js",
+        "js/bootstrap-select.js",
+        "css/bootstrap-select.css",
+        "css/bootstrap-select.css.map",
+        "css/bootstrap-select.min.css"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "jquery-ajax-unobtrusive@3.2.6",
+      "destination": "wwwroot/jquery-ajax-unobtrusive/",
+      "files": [
+        "dist/jquery.unobtrusive-ajax.js",
+        "dist/jquery.unobtrusive-ajax.min.js"
+      ]
+    }
+  ]
+}
