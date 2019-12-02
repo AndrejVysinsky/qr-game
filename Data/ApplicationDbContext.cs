@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System.Configuration;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using QuizWebApp.Models;
 
@@ -11,8 +12,6 @@ namespace QuizWebApp.Data
         {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite("Data Source=quizwebapp.db");
 
         public virtual DbSet<Contest> Contests { get; set; }
         public virtual DbSet<Question> Questions { get; set; }
