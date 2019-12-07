@@ -1,7 +1,38 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
     ViewData["Title"] = "Hlavná stránka";
 }
 
+@if (SignInManager.IsSignedIn(User))
+{
+    if (User.IsInRole("Admin"))
+    {
+        <div>
+            <h3>Ste prihlásený ako administrátor.</h3>
+        </div>
+
+        @*treba dopisat*@
+    }
+    else
+    {
+        <div>
+            <h3>O hre</h3>
+            <p>QRGame je webová aplikácia vytvorená na Fakulte riadenia a informatiky. </p>
+            <p>
+                Cieľom hry je nájsť všetky QR kódy, naskenovať ich a odpovedať na otázky.
+                Po nájdení všetkých QR kódov sa vám zobrazí výsledné skóre. Svoj postup môžete sledovať v záložke <b>Moje súťaže</b>.
+            </p>
+
+            @*treba dopisat*@
+
+        </div>
+    }
+}
+else
+{
     <div class="text-center">
         <h1 class="display-4">Vitajte</h1>
         <br />
@@ -24,5 +55,21 @@
         <p class="lead">
             2. Súťaž nie je aktívna
         </p>
-
     </div>
+}
+
+<br />
+<div class="text-center">
+    <span class="divLogo">
+        <a href="https://www.fri.uniza.sk/" target="_blank">
+            <img src="~/uploads/bg/fri_bez_pozadia.png" width="300" />
+        </a>
+    </span>
+    <span class="divLogo">
+        <a href="http://www.budfri.sk/" target="_blank">
+            <img src="~/uploads/bg/budFRI_bez_pozadia.png" width="200" />
+        </a>
+    </span>
+</div>
+
+
