@@ -15,5 +15,14 @@ RUN dotnet publish "QuizWebApp.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+
+# install System.Drawing native dependencies
+RUN apt-get update \
+    && apt-get install -y --allow-unauthenticated \
+        libc6-dev \
+        libgdiplus \
+        libx11-dev \
+     && rm -rf /var/lib/apt/lists/*
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "QuizWebApp.dll"]
