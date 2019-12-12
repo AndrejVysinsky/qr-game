@@ -10,26 +10,49 @@
 {
     if (User.IsInRole("Admin"))
     {
-        <div>
-            <h3>Ste prihlásený ako administrátor.</h3>
+        <h3 class="text-info">Ste prihlásený ako administrátor.</h3>
+        <br />
+    }
+    <div>
+        <h3>O stránke</h3>
+        <br />
+        <p><b>FRI QR Kvíz</b> je webová aplikácia vytvorená na <a href="https://www.fri.uniza.sk/">Fakulte riadenia a informatiky</a>. </p>
+        <p>
+            Jedná sa o interaktívnu kvízovú hru, v ktorej si overíte Vaše vedomosti, a zároveň hráte o zaujímavé ceny.
+
+            Podstata hry je jednoduchá. Po fakulte môžete nájsť vyvesené QR kódy s názvom súťaže a číslom otázky,
+            ktoré keď naskenujete, tak Vás presmerujú na otázku, na ktorú musíte odpovedať.
+
+            Cieľ hry je teda nájsť všetky otázky a odpovedať správne na čo najviac z nich. Čím viac správnych odpovedí, tým máte väčšiu šancu niečo vyhrať.
+
+            Svoj postup v súťaži môžete sledovať v záložke <b>Moje súťaže</b>. Po odpovedaní na všetky otázky sa Vám zobrazí počet správnych odpovedí.
+        </p>
+        <p>
+            Prajeme Vám veľa šťastia. :)
+        </p>
+
+        <p>
+            <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Nápoveda
+            </button>
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                <p>
+                    Pre zapojenie sa do súťaže je nutné mať v mobile skener QR kódov. Ak máte aspoň <b>Adroid 9</b> alebo <b>iOS 11</b>,
+                    skener už máte zabudovaný v kamere. Stačí iba otvoriť kameru, namieriť na QR kód a vaše zariadenie ho automaticky rozpozná.
+                </p>
+                <p>
+                    V prípade, že nemáte skener zabudovaný v mobile, na <b>Google Play</b> alebo <b>App Store</b> môžete nájsť aplikácie na skenovanie QR kódov.
+                </p>
+                <p>
+                    Jediné čo už ostáva je zúčastniť sa jednej z našich súťaží a odpovedať na čo najviac otázok správne. :)
+                </p>
+            </div>
         </div>
 
-        @*treba dopisat*@
-    }
-    else
-    {
-        <div>
-            <h3>O hre</h3>
-            <p>QRGame je webová aplikácia vytvorená na Fakulte riadenia a informatiky. </p>
-            <p>
-                Cieľom hry je nájsť všetky QR kódy, naskenovať ich a odpovedať na otázky.
-                Po nájdení všetkých QR kódov sa vám zobrazí výsledné skóre. Svoj postup môžete sledovať v záložke <b>Moje súťaže</b>.
-            </p>
+    </div>
 
-            @*treba dopisat*@
-
-        </div>
-    }
 }
 else
 {

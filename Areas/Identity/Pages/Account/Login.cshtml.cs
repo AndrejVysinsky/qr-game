@@ -129,10 +129,10 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
                 pageHandler: null,
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                Input.Email,
-                "Potvďte svoj email",
-                $"Prosím aktivujte si svoj účet kliknutím na nasledujúci <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>odkaz</a>.");
+
+            await _emailSender.SendEmailAsync(Input.Email, "Potvrďte svoj email",
+                        $"Svoj účet si aktivujete kliknutím na nasledujúci <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>odkaz</a>.\n\n" +
+                        $"Prajeme veľa šťastia a správnych odpovedí. :)");
 
             ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
             return Page();
