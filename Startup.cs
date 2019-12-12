@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Hangfire;
 using System.Timers;
 using System.IO;
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace QuizWebApp
 {
@@ -107,6 +109,8 @@ namespace QuizWebApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { KnownNetworks = { new IPNetwork(IPAddress.Parse("172.21.0.0"), 16) }, ForwardedHeaders = ForwardedHeaders.All });
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
