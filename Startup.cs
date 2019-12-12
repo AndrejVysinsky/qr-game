@@ -82,7 +82,7 @@ namespace QuizWebApp
             {
                 facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                 facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                facebookOptions.CallbackPath = "/signin-facebook";
+                //facebookOptions.CallbackPath = "/signin-facebook";
             });
 
             services.AddRouting(options => options.LowercaseUrls = true);

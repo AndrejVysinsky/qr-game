@@ -323,7 +323,7 @@ namespace QuizWebApp.Controllers
 
             //ak sutaz nie je aktivna, nezobrazuj otázku
             if (!contestQuestion.Contest.isActive)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ErrorPage", "Home", new { chybovaHlaska = "Je nám ľúto, ale táto súťaž momentálne nie je aktívna." });
 
             //ak uz uzivatel na otazku odpovedal
             var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -333,7 +333,7 @@ namespace QuizWebApp.Controllers
                                                 .SingleOrDefault();
 
             if (contestQuestionUser != null)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ErrorPage", "Home", new { chybovaHlaska = "Na túto otázku ste už raz odpovedali. Skúste nájsť a naskenovať ďalšiu." });
 
             return View(contestQuestion);
         }

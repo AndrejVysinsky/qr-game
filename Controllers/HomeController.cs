@@ -30,6 +30,12 @@ namespace QuizWebApp.Controllers
             return View();
         }
 
+        public IActionResult ErrorPage(string chybovaHlaska)
+        {
+            ViewBag.Chyba = chybovaHlaska;
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
