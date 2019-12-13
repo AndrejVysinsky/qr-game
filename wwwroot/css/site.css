@@ -61,7 +61,7 @@ html {
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
-    background-image: url(../uploads/bg/background.png);
+    background-image: url(../bg/background.png);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -107,7 +107,7 @@ body {
     }
 
     .phoneImg {
-        background-image: url(../uploads/bg/phoneImg.png);
+        background-image: url(../bg/phoneImg.png);
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
