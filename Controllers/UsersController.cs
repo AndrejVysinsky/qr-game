@@ -376,7 +376,7 @@ namespace QuizWebApp.Controllers
             //ulozit zmeny
             _context.SaveChanges();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Contests");
         }
     }
 }

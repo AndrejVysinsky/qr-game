@@ -5,24 +5,50 @@
     ViewData["Title"] = "Prihlásenie";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+
+<aside class="row justify-content-center">
+    <div class="card col-11 col-sm-10 col-md-8 col-lg-6">
+        <article class="card-body">
+            <a class="float-right btn btn-outline-primary" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Registrácia</a>
+            <h4 class="card-title mb-4 mt-1">Prihlásenie</h4>
+            @{
+                if ((Model.ExternalLogins?.Count ?? 0) != 0)
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <p>
+                            @foreach (var provider in Model.ExternalLogins)
+                            {
+                                <button type="submit" class="btn btn-block btn-outline-primary" name="provider" value="@provider.Name"> <i class="fab fa-facebook-f"></i>   Prihlásiť sa cez @provider.Name</button>
+                            }
+                        </p>
+                    </form>
+                }
+            }
+            <hr>
             <form id="account" method="post">
-                <h4>pomocou mena a hesla</h4>
-                <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
+
                 <div class="form-group">
-                    <label asp-for="Input.Email"></label>
-                    <input asp-for="Input.Email" class="form-control" />
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                        </div>
+                        <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Heslo</label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                        </div>
+                        <input asp-for="Input.Password" class="form-control" placeholder="******" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
                 </div>
+
                 <div class="form-group">
                     <div class="checkbox">
                         <label>
@@ -31,56 +57,22 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Prihlásiť</button>
-                </div>
-                <div class="form-group">
-                    <p>
+
+                <div class="row">
+                    <div class="col-md-6 my-auto">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block"> Prihlásiť  </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-right my-auto">
                         <a id="forgot-password" asp-page="./ForgotPassword">Zabudli ste heslo?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Registrovať sa ako nový užívateľ.</a>
-                    </p>
-                    @*<p>
-                        <button type="submit" asp-page-handler="SendVerificationEmail" class="btn-link" style="padding:0px;margin:0px;border:0px">Resend email confirmation</button>
-                    </p>*@
+                    </div>
                 </div>
             </form>
-        </section>
+        </article>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h4>Použiť externú službu na prihlásenie.</h4>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
-                            for details on setting up this ASP.NET application to support logging in via external services.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins)
-                                {
-                                    <label>Prihlásiť sa pomocou @provider.DisplayName účtu</label>
-                                    <br />
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Prihlásiť sa pomocou @provider.DisplayName účtu">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
-</div>
+
+</aside>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

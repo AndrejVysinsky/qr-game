@@ -180,3 +180,7 @@ body {
 .divLogo {
     margin-right: 50px;
 }
+
+.card-header:hover {
+    cursor: pointer;
+}
