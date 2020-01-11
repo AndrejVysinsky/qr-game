@@ -35,7 +35,6 @@
                             <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                         </div>
                         <input asp-for="Input.Email" class="form-control" placeholder="Email" />
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -45,7 +44,6 @@
                             <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                         </div>
                         <input asp-for="Input.Password" class="form-control" placeholder="******" />
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -61,7 +59,7 @@
                 <div class="row">
                     <div class="col-md-6 my-auto">
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary btn-block"> Prihlásiť  </button>
+                            <button type="submit" class="btn btn-primary btn-block" onclick="return login()"> Prihlásiť  </button>
                         </div>
                     </div>
                     <div class="col-md-6 text-right my-auto">
@@ -75,5 +73,5 @@
 </aside>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial" />    
 }

@@ -75,6 +75,8 @@ body {
   line-height: 60px; /* Vertically center the text there */
 }
 
+/*Moj kod*/
+
 .my-auto {
     margin-top: auto;
     margin-bottom: auto;
@@ -184,3 +186,73 @@ body {
 .card-header:hover {
     cursor: pointer;
 }
+
+/*Nove UI*/
+
+* {
+    font-family: 'Open Sans', sans-serif;
+    border-radius: 0 !important;
+}
+
+.brand {
+    letter-spacing: 3px;
+}
+
+.nav-link {
+    text-transform: capitalize;
+    color: #333;
+    transition: background-color .2s, color .2s;
+}
+
+.nav-link:hover {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.nav-link-active {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.navbar {
+    background-color: rgba(255,255,255, .85);
+    border-bottom: 2px solid #343a40;
+    padding: 0;    
+    line-height: 40px;
+}
+
+@media (max-width: 991.98px) {
+    .navbar-buger-menu {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+}
+
+.navbar li {
+    letter-spacing: 1px;
+}
+
+/*Override bootstrapu*/
+
+.navbar-toggler {
+    padding: 0.25rem 0.75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    color: rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    content: "";
+    background: no-repeat center center;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+

@@ -2,25 +2,39 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+@using Microsoft.AspNetCore.Http.Extensions
+@{
+    string pageUrl = Context.Request.GetDisplayUrl();
+}
+
     <ul class="navbar-nav">
         @if (SignInManager.IsSignedIn(User))
-        {            
+        {
             <li class="nav-item">
-                <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Vitajte @User.Identity.Name!</a>
+                <a class="nav-link @(pageUrl.ToLower().Contains("account/manage") ? "nav-link-active" : string.Empty)"
+                   asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Vitajte @User.Identity.Name!</a>
             </li>
             <li class="nav-item">
-                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="nav-link btn btn-link text-light">Odhlásiť</button>
-                </form>
+                <a href="#" class="nav-link">Odhlásiť</a>
             </li>
+            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            </form>
         }
         else
         {
             <li class="nav-item">
-                <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Login">Prihlásenie</a>
+                <a class="nav-link @(pageUrl.ToLower().Contains("account/login") ? "nav-link-active" : string.Empty)"
+                   asp-area="Identity" asp-page="/Account/Login">Prihlásenie</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register">Registrácia</a>
+                <a class="nav-link @(pageUrl.ToLower().Contains("account/register") ? "nav-link-active" : string.Empty)"
+                   asp-area="Identity" asp-page="/Account/Register">Registrácia</a>
             </li>
         }
     </ul>
+
+<script>
+    $('a').on("click", function () {
+        $("#logoutForm").submit();
+    });
+</script>

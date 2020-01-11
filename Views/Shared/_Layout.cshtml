@@ -2,6 +2,12 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+
+@using Microsoft.AspNetCore.Http.Extensions
+@{
+    string pageUrl = Context.Request.GetDisplayUrl();
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +18,10 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
-    
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -33,9 +42,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-toggleable-lg navbar-dark bg-dark border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FRI QR Kvíz</a>
+        <nav class="navbar navbar-buger-menu navbar-expand-lg navbar-toggleable-lg box-shadow mb-3">
+            <div class="container" id="divHeader">
+                <a class="navbar-brand brand text-dark" asp-area="" asp-controller="Home" asp-action="Index">FRI QR Kvíz</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -43,26 +52,31 @@
                 <div class="navbar-collapse collapse d-lg-inline-flex flex-lg-row-reverse">
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
+
                         @if (SignInManager.IsSignedIn(User))
                         {
                             if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-controller="Questions" asp-action="Index">Otázky</a>
+                                    <a class="nav-link @(pageUrl.ToLower().Contains("questions") ? "nav-link-active" : string.Empty)"
+                                       asp-area="" asp-controller="Questions" asp-action="Index">Otázky</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-controller="Contests" asp-action="Index">Súťaže</a>
+                                    <a class="nav-link @(pageUrl.ToLower().Contains("/contests") ? "nav-link-active" : string.Empty)" 
+                                       asp-area="" asp-controller="Contests" asp-action="Index">Súťaže</a>
                                 </li>
 
                             }
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="Contests">Moje súťaže</a>
+                                <a class="nav-link @(pageUrl.ToLower().Contains("users/mycontests") ? "nav-link-active" : string.Empty)"
+                                   asp-area="" asp-controller="Users" asp-action="MyContests">Moje súťaže</a>
                             </li>
 
                             if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-controller="Users" asp-action="Answers">Odpovede</a>
+                                    <a class="nav-link @(pageUrl.ToLower().Contains("users/answers") ? "nav-link-active" : string.Empty)"
+                                       asp-area="" asp-controller="Users" asp-action="Answers">Odpovede</a>
                                 </li>
                             }
                         }
@@ -84,6 +98,6 @@
             &copy; 2019 - FRI QR Kvíz @*- <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>*@
         </div>
     </footer>
-    
+
 </body>
 </html>

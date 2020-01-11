@@ -31,7 +31,7 @@ namespace QuizWebApp.Controllers
             _hostEnvironment = hostEnvironment;
         }
 
-        public ActionResult Contests()
+        public ActionResult MyContests()
         {
             var answersCount = new List<int>();
             var correctAnswersCount = new List<int>();

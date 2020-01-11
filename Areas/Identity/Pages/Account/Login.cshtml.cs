@@ -46,15 +46,15 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Zadajte email.")]
             [EmailAddress(ErrorMessage = "Zadaný email nie je platný.")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Zadajte heslo.")]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Zapamätať si ma?")]
             public bool RememberMe { get; set; }
         }
 
@@ -101,7 +101,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Zadané údaje nie sú správne.");
-                    return Page();
+                    return new JsonResult("error");
                 }
             }
 
