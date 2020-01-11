@@ -15,7 +15,7 @@
                    asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Vitajte @User.Identity.Name!</a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">Odhlásiť</a>
+                <a id="logoutLink" href="#" class="nav-link">Odhlásiť</a>
             </li>
             <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
             </form>
@@ -34,7 +34,7 @@
     </ul>
 
 <script>
-    $('a').on("click", function () {
+    $("#logoutLink").on("click", function () {
         $("#logoutForm").submit();
     });
 </script>
