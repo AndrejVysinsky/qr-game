@@ -15,7 +15,7 @@
         <div class="col-auto my-auto">
             @if (Model.Question.Image != null)
             {
-                <img src="~/uploads/images/@Model.Question.Image" class="img-fluid" width="300">
+                <img src="~/uploads/images/@Model.Question.Image" class="img-fluid" width="300" alt="Obrázok otázky">
             }
         </div>
     </div>
@@ -33,7 +33,7 @@
                 @if (Model.Question.Answers[i].Text == null)
                 {
                     <div class="col-4 col-sm-4 answerDivImg my-auto">
-                        <img src="~/uploads/images/@Model.Question.Answers[i].Image" class="img-fluid cold-auto my-auto" width="200">
+                        <img src="~/uploads/images/@Model.Question.Answers[i].Image" class="img-fluid cold-auto my-auto" width="200" alt="Obrázok odpovede">
                     </div>
                 }
                 else
@@ -51,7 +51,7 @@
                         </div>
 
                         <div class="col-4 col-sm-4 answerDivImg my-auto">
-                            <img src="~/uploads/images/@Model.Question.Answers[i].Image" class="img-fluid cold-auto my-auto" width="200">
+                            <img src="~/uploads/images/@Model.Question.Answers[i].Image" class="img-fluid cold-auto my-auto" width="200" alt="Obrázok odpovede">
                         </div>
                     }
                 }

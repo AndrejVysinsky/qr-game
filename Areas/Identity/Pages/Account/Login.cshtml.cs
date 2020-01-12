@@ -101,9 +101,11 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Zadané údaje nie sú správne.");
-                    return new JsonResult("error");
                 }
             }
+
+            //Ensure that external logins dont disappear after failed login attempt
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             // If we got this far, something failed, redisplay form
             return Page();

@@ -15,6 +15,7 @@
                 @Html.LabelFor(a => a.Name, new { @class = "font-weight-bold" })
                 @Html.TextBoxFor(a => a.Name, new { @class = "form-control", id = "questionName" })
                 <span id="questionNameValidation" class="text-danger"></span>
+                <span id="nazovExistuje" class="text-danger" style="display:none">Zadaný názov otázky už existuje.</span>
             </div>
         </div>
         <br />
@@ -33,7 +34,7 @@
             @if (Model.Image != null)
             {
                 <div class="col-2 my-auto">
-                    <img src="~/uploads/temps/@Model.Image" width="100" class="img-thumbnail img-fluid">
+                    <img src="~/uploads/temps/@Model.Image" width="100" class="img-thumbnail img-fluid" alt="Obrázok otázky">
                 </div>
                 <div class="col-1 my-auto">
                     <input asp-action="RemoveImage" asp-route-img="@Model.Image" asp-route-editing="false" type="submit" value="X" class="btn btn-dark" formmethod="post"
@@ -78,7 +79,7 @@
                         @if (Model.Answers[i].Image != null)
                         {
                             <div class="col-1 my-auto">
-                                <img src="~/uploads/temps/@Model.Answers[i].Image" width="50" class="img-thumbnail img-fluid" id="answerImage@(i)">
+                                <img src="~/uploads/temps/@Model.Answers[i].Image" width="50" class="img-thumbnail img-fluid" id="answerImage@(i)" alt="Obrázok odpovede">
                             </div>
                             <div class="col-1 my-auto">
                                 <input asp-action="RemoveImage" asp-route-img="@Model.Answers[i].Image" asp-route-editing="false" type="submit" value="X" class="btn btn-dark" formmethod="post"
@@ -212,5 +213,24 @@
 
         return isValid;
     }
+
+    $(document).ready(function () {
+        $('#questionName').on('change', function () {
+            var question = $("#questionName").val();
+            $.ajax({
+                type: "POST",
+                url: "/questions/checkquestionname",
+                data: JSON.stringify(question),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response)
+                        $("#nazovExistuje").show();
+                    else
+                        $("#nazovExistuje").hide();
+                }
+            });
+        })
+    });
     
 </script>

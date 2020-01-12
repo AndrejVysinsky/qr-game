@@ -47,6 +47,13 @@ namespace QuizWebApp.Controllers
             return View(question);
         }
 
+        public IActionResult CheckQuestionName([FromBody]string questionName)
+        {
+            bool result = _context.Questions.ToList().Exists(q => q.Name == questionName);
+
+            return new JsonResult(result);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Question question)
