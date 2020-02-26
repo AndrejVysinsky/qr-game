@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.UserModel;
@@ -23,12 +24,15 @@ namespace QuizWebApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly string _userId;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly UserManager<ApplicationUser> _manager;
 
-        public UsersController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
+        public UsersController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, 
+                                IWebHostEnvironment hostEnvironment, UserManager<ApplicationUser> manager)
         {
             _context = context;
             _userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             _hostEnvironment = hostEnvironment;
+            _manager = manager;
         }
 
         public ActionResult MyContests()
@@ -376,7 +380,7 @@ namespace QuizWebApp.Controllers
             //ulozit zmeny
             _context.SaveChanges();
 
-            return RedirectToAction("Contests");
+            return RedirectToAction("MyContests");
         }
     }
 }

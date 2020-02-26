@@ -14,6 +14,7 @@ namespace QuizWebApp.Models
     //[NotMapped]
     public class ApplicationUser : IdentityUser
     {
+        public bool isTemporary { get; set; }
         public virtual ICollection<ContestQuestionUser> ContestQuestionUsers { get; set; }
     }
 }

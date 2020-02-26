@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -105,7 +106,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        await _signInManager.SignInAsync(user, isPersistent: true);
                         return LocalRedirect(returnUrl);
                     }
                 }
@@ -123,7 +124,63 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
         {
             bool exists = _context.ApplicationUsers.ToList().Exists(email => email.Email == useremail);
 
+            if (useremail.Contains("@frivia.sk"))
+                exists = true;
+
             return new JsonResult(exists);
+        }
+		
+		public async Task<IActionResult> OnPostAnonymous(string returnUrl = null)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/");
+
+            int newID = generateGuestID();
+            string guestEmail = "guest" + newID + "@frivia.sk";
+            
+            var user = new ApplicationUser { UserName = guestEmail, Email = guestEmail, isTemporary = true };
+
+            var result = await _userManager.CreateAsync(user);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.");
+                
+                await _signInManager.SignInAsync(user, isPersistent: true);
+                return LocalRedirect(returnUrl);
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return LocalRedirect(returnUrl);
+        }
+
+        public int generateGuestID()
+        {
+
+            //zle zoradi dvojciferne oproti jednocifernym
+            /*var users = _context.ApplicationUsers.Where(ap => ap.isTemporary == true).OrderBy(ap => ap.Email).ToList();
+
+            if (users.Count == 0)
+                return 1;
+
+            string lastEmail = users.Last().Email;
+            string extractNumber = Regex.Match(lastEmail, @"\d+").Value;
+            int id = Int32.Parse(extractNumber);*/
+
+            var users = _context.ApplicationUsers.Where(ap => ap.isTemporary == true).ToList();
+
+            int max = 0;
+            foreach (var user in users)
+            {
+                string extractNumber = Regex.Match(user.Email, @"\d+").Value;
+                int id = Int32.Parse(extractNumber);
+
+                if (id > max)
+                    max = id;
+            }
+
+            return max + 1;
         }
     }
 }

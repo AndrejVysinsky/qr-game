@@ -11,6 +11,13 @@
         <article class="card-body">
             <a class="float-right btn btn-outline-primary" asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Prihlásiť</a>
             <h4 class="card-title mb-4 mt-1">Registrácia</h4>
+
+            <form asp-page-handler="Anonymous" method="post" class="form-horizontal">
+                <p>
+                    <button type="submit" class="btn btn-block btn-outline-secondary">Pokračovať anonymne</button>
+                </p>
+            </form>
+
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) != 0)
                 {

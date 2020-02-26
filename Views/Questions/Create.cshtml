@@ -21,7 +21,7 @@
         <br />
         <div class="form-group">
             @Html.LabelFor(a => a.Text, new { @class = "font-weight-bold" })
-            @Html.TextAreaFor(a => a.Text, new { id = "mytextarea" })
+            @Html.TextAreaFor(a => a.Text, new { id = "questionTextArea" })
             <span id="textAreaValidation" class="text-danger"></span>
         </div>
 
@@ -73,7 +73,7 @@
                             <input type="radio" name="IsCorrect" value="@i" class="big-radio" checked="checked" />
                         </div>
                         <div class="col-7 my-auto">
-                            @Html.TextBoxFor(a => a.Answers[i].Text, new { @class = "form-control answerText" })
+                            @Html.TextAreaFor(a => a.Answers[i].Text, new { @class = "answerTextArea" })
                             <span id="answerTextValidation@(i)" class="text-danger"></span>
                         </div>
                         @if (Model.Answers[i].Image != null)
@@ -125,7 +125,11 @@
 
 <script>
     tinymce.init({
-        selector: '#mytextarea',
+        selector: '#questionTextArea',
+        forced_root_block: "",
+        menubar: false,
+        toolbar: 'undo redo bold italic alignleft aligncenter alignright outdent indent code',
+        plugins: 'code',
         init_instance_callback: function (editor) {
             editor.on('Change', function (e) {
 
@@ -138,6 +142,32 @@
                 else
                 {
                     $('#textAreaValidation').text("");
+                }
+            });
+        }
+    });
+
+    tinymce.init({
+        selector: '.answerTextArea',
+        menubar: false,
+        height: 150,
+        forced_root_block: "",
+        toolbar: 'undo redo bold italic alignleft aligncenter alignright outdent indent code',
+        plugins: 'code',
+        init_instance_callback: function (editor) {
+            editor.on('Change', function (e) {
+
+                let dataID = editor.settings.id;
+                let index = dataID.match(/\d+/)[0];
+
+                var editorContent = $.trim(editor.getContent({ format: 'text' }));
+                if (editorContent.length > 0 || $('#answerImage' + index).length > 0)
+                {
+                    $('#answerTextValidation' + index).text("");
+                }
+                else
+                {
+                    $('#answerTextValidation' + index).text("Odpoveď musí mať text alebo obrázok.");
                 }
             });
         }
@@ -161,28 +191,13 @@
         }
 
     });
-
-    $(".answerText").change(function () {
-        let answerDiv = $(this).parent().parent().parent();
-        let index = $(this).parent().parent().parent().parent().children();
-        index = index.index(answerDiv);
-
-        if ($.trim($(this).val()).length > 0 || $('#answerImage' + index).length > 0)
-        {
-            $('#answerTextValidation' + index).text("");
-        }
-        else
-        {
-            $('#answerTextValidation' + index).text("Odpoveď musí mať text alebo obrázok.");
-        }
-    });
-        
+    
 
     function validate()
     {
         var isValid = true;
 
-        var editorContent = $.trim(tinyMCE.get('mytextarea').getContent({ format: 'text' }));
+        var editorContent = $.trim(tinyMCE.get('questionTextArea').getContent({ format: 'text' }));
         if (editorContent.length == 0)
         {
             $('#textAreaValidation').text("Otázka musí mať vyplnený text.");
@@ -196,9 +211,10 @@
         }        
 
         var i = 0;
-        $(".answerText").each(function () {
-
-            if ($.trim($(this).val()).length == 0 && $('#answerImage' + i).length == 0)
+        $(".answerTextArea").each(function () {
+            
+            var editorContent = $.trim(tinyMCE.get('Answers_' + i + '__Text').getContent({ format: 'text' }));
+            if (editorContent.length == 0 && $('#answerImage' + i).length == 0)
             {
                 $('#answerTextValidation' + i).text("Odpoveď musí mať text alebo obrázok.");
                 isValid = false;
@@ -206,6 +222,10 @@
             i++;
 
         });
+
+        if ($('#nazovExistuje').is(':visible')) {
+            isValid = false;
+        }
 
         if (isValid == false) {
             alert("Vyplňte prosím všetky požadované polia.");
@@ -217,11 +237,11 @@
     $(document).ready(function () {
         $('#questionName').on('change', function () {
             var question = $("#questionName").val();
+            var questionID = 0;
             $.ajax({
                 type: "POST",
                 url: "/questions/checkquestionname",
-                data: JSON.stringify(question),
-                contentType: "application/json; charset=utf-8",
+                data: { 'questionName' : question, 'questionID' : questionID },
                 dataType: "json",
                 success: function (response) {
                     if (response)

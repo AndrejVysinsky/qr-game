@@ -10,6 +10,10 @@
   <ItemGroup>
     <Compile Remove="Data\Migrations\20191116093858_testik.cs" />
     <Compile Remove="Data\Migrations\20191116093858_testik.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200223161156_ss.cs" />
+    <Compile Remove="Data\Migrations\20200223161156_ss.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200223161320_DBFix.cs" />
+    <Compile Remove="Data\Migrations\20200223161320_DBFix.Designer.cs" />
   </ItemGroup>
 
 
