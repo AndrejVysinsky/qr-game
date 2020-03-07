@@ -8,7 +8,6 @@
     bool existsActiveContest = false;
 }
 
-
 @if (user.isTemporary)
 {
     <div class="alert alert-warning">
@@ -29,12 +28,12 @@
 }
 
 <p>
-    <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseQRScanner" aria-expanded="false" aria-controls="collapseExample">
         Naskenovanie QR kódu
     </button>
 </p>
 
-<div class="collapse" id="collapseExample">
+<div class="collapse" id="collapseQRScanner">
     <div class="card card-body">
         <div id="loadingMessage">🎥 Nebolo možné načítať video (uistite sa, že máte zapnutú a povolenú kameru)</div>
         <canvas id="canvas" hidden></canvas>
@@ -42,7 +41,6 @@
 </div>
 
 <br />
-
 
 <h3>Práve prebiehajúce súťaže</h3>
 <hr />
@@ -158,7 +156,6 @@
     }
 }
 
-
 <script src="~/lib/qr-scanner/jsQR.js"></script>
 
 <script>
@@ -187,9 +184,6 @@
     var canvasElement = document.getElementById("canvas");
     var canvas = canvasElement.getContext("2d");
     var loadingMessage = document.getElementById("loadingMessage");
-    //var outputContainer = document.getElementById("output");
-    //var outputMessage = document.getElementById("outputMessage");
-    //var outputData = document.getElementById("outputData");
 
     function drawLine(begin, end, color) {
         canvas.beginPath();
@@ -201,20 +195,35 @@
     }
 
     // Use facingMode: environment to attemt to get the front camera on phones
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function (stream) {
-        video.srcObject = stream;
-        video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-        video.play();
-        requestAnimationFrame(tick);
-    });
+    $('#collapseQRScanner').on('show.bs.collapse', function () {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function (stream) {
+            videoStream = stream;
+            video.srcObject = stream;
+            video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+            video.play();            
+            requestAnimationFrame(tick);
+        });
+    })
+
+    $('#collapseQRScanner').on('hide.bs.collapse', function () {
+
+        //zrusi stream ale ostane notifikacia o zapnutej kamere, preto bude asi lepsi reload stranky
+        /*
+        cancelAnimationFrame(tick);
+        video.pause();
+        video.srcObject.stop();
+
+        loadingMessage.hidden = false;
+        canvasElement.hidden = true;*/
+
+        location.reload();
+    })
 
     function tick() {
         loadingMessage.innerText = "⌛ Loading video..."
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             loadingMessage.hidden = true;
             canvasElement.hidden = false;
-            //outputContainer.hidden = false;
-
 
             canvasElement.height = video.videoWidth;
             canvasElement.width = video.videoWidth;
@@ -228,7 +237,6 @@
                 drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
                 drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
                 drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
-                //window.location.replace(code.data);
                 window.location.href = code.data;
             }
         }
