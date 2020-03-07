@@ -5,10 +5,11 @@
 @{
     ViewData["Title"] = "Moje súťaže";
     var user = await UserManager.GetUserAsync(User);
+    bool existsActiveContest = false;
 }
 
 
-@if (user.isTemporary) 
+@if (user.isTemporary)
 {
     <div class="alert alert-warning">
         <p>
@@ -27,180 +28,138 @@
     </div>
 }
 
-<h2>Súhrn účasti v súťažiach</h2>
+<p>
+    <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        Naskenovanie QR kódu
+    </button>
+</p>
+
+<div class="collapse" id="collapseExample">
+    <div class="card card-body">
+        <div id="loadingMessage">🎥 Nebolo možné načítať video (uistite sa, že máte zapnutú a povolenú kameru)</div>
+        <canvas id="canvas" hidden></canvas>
+    </div>
+</div>
+
 <br />
 
-@*
-    @for (int i = 0; i < Model.contests.Count; i++)
+
+<h3>Práve prebiehajúce súťaže</h3>
+<hr />
+
+@for (int i = 0; i < Model.contests.Count; i++)
+{
+    @if (Model.contests[i].isActive)
     {
-        <div class="card card-header" data-toggle="collapse" data-target="#collapse@(i)" aria-expanded="false" aria-controls="collapse@(i)">
+        existsActiveContest = true;
+        <div class="card-body">
             <h4>@Model.contests[i].Name</h4>
-        </div>
-        <div class="collapse" id="collapse@(i)">
 
-            <div class="progress">
-                @if (Model.contests[i].isActive)
-                {
+            @if (Model.answersCount[i] == Model.contests[i].ContestQuestions.Count)
+            {
+                <p>
+                    Výsledné skóre:
+                    <span class="font-weight-bold">
+                        @Model.correctAnswersCount[i]
+                    </span>
+                    /
+                    <span class="font-weight-bold">
+                        @Model.contests[i].ContestQuestions.Count
+                    </span>
+                </p>
+
+                <div class="progress">
                     <div class="progress-bar bg-success" role="progressbar"
-                         style="width: @(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)%"
-                         aria-valuenow="@(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)"
+                         style="width: @((int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))%"
+                         aria-valuenow="@((int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))"
                          aria-valuemin="0" aria-valuemax="100"></div>
-                }
-                else
-                {
-                    <div class="progress-bar bg-secondary" role="progressbar"
-                         style="width: @(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)%"
-                         aria-valuenow="@(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)"
+                    <div class="progress-bar bg-danger" role="progressbar"
+                         style="width: @(100 - (int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))%"
+                         aria-valuenow="@(100 - (int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))"
                          aria-valuemin="0" aria-valuemax="100"></div>
-                }
+                </div>
+            }
+            else
+            {
+                <p>
+                    Odpovedali ste na @Model.answersCount[i] z @Model.contests[i].ContestQuestions.Count otázok
+                </p>
 
-            </div>
-
-            <div class="card card-body">
-                <div class="row text-center">
-                    <div class="col-auto my-auto font-weight-bold">#1</div>
-                    <div class="col-auto text-danger my-auto">
-                        Koľko rôznych fakúlt má Žilinská univerzita ?
-                    </div>
+                <div class="progress">
+                    <div class="progress-bar bg-info" role="progressbar"
+                         style="width: @((int)(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))%"
+                         aria-valuenow="@((int)(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))"
+                         aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <div class="row text-center">
-                    <div class="col-auto invisible">#1</div>
-                    <div class="col-auto my-auto font-weight-bold">
-                        Správna odpoveď:
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <div class="col-auto invisible">#1</div>
-                    <div class="col-auto my-auto">
-                        7
-                    </div>
-                </div>
-
-                <hr />
-                <div class="row text-center">
-                    <div class="col-auto my-auto font-weight-bold">#2</div>
-                    <div class="col-auto my-auto">
-                        ???
-                    </div>
-                </div>
-                <hr />
-                <div class="row text-center">
-                    <div class="col-auto my-auto font-weight-bold">#3</div>
-                    <div class="col-auto text-success my-auto">
-                        Aký bol pôvodný názov Fakulty riadenia a informatiky ?
-                    </div>
-                </div>
-                <hr />
-                <div class="row text-center">
-                    <div class="col-auto my-auto font-weight-bold">#4</div>
-                    <div class="col-auto my-auto">
-                        ???
-                    </div>
-                </div>
+            }
 
 
-            </div>
         </div>
-        <br />
-    }*@
+    }
+}
 
-<table id="dataTable" class="table table-striped">
-    <thead class="thead-dark">
-        <tr>
-            <th>
-                #
-            </th>
-            <th>
-                Súťaž
-            </th>
-            <th class="text-center">
-                Výsledok
-            </th>
-            <th class="text-center">
-                Stav súťaže
-            </th>
-        </tr>
+@if (!existsActiveContest)
+{
+    <p>
+        Momentálne neprebieha žiadna súťaž.
+    </p>
+}
 
-    </thead>
-    <tbody class="bg-white">
-        @for (int i = 0; i < Model.contests.Count; i++)
-        {
-            <tr>
-                <td>@(i + 1)</td>
-                <td>@Html.DisplayFor(a => a.contests[i].Name)</td>
-                <td class="text-center">
-                    @if (Model.answersCount[i] == 0)
-                    {
-                        <span>Nenašiel sa záznam o odpovediach</span>
-                    }
-                    else if (Model.answersCount[i] == Model.contests[i].ContestQuestions.Count)
-                    {
-                        <div class="progress">
-                            @if (Model.contests[i].isActive)
-                            {
-                                <div class="progress-bar bg-success" role="progressbar"
-                                     style="width: @(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)%"
-                                     aria-valuenow="@(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)"
-                                     aria-valuemin="0" aria-valuemax="100"></div>
-                            }
-                            else
-                            {
-                                <div class="progress-bar bg-secondary" role="progressbar"
-                                     style="width: @(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)%"
-                                     aria-valuenow="@(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)"
-                                     aria-valuemin="0" aria-valuemax="100"></div>
-                            }
+<hr />
+<br />
+<h3>Ukončené súťaže</h3>
+<hr />
 
-                        </div>
+@for (int i = 0; i < Model.contests.Count; i++)
+{
+    @if (!Model.contests[i].isActive)
+    {
+        <div class="card-body contest-inactive">
+            <h4>@Model.contests[i].Name</h4>
 
-                        <span>
-                            Výsledné skóre:
-                            <span class="font-weight-bold">
-                                @Model.correctAnswersCount[i]
-                            </span>
-                            /
-                            <span class="font-weight-bold">
-                                @Model.contests[i].ContestQuestions.Count
-                            </span>
-                        </span>
+            @if (Model.answersCount[i] == Model.contests[i].ContestQuestions.Count)
+            {
+                <p>
+                    Výsledné skóre:
+                    <span class="font-weight-bold">
+                        @Model.correctAnswersCount[i]
+                    </span>
+                    /
+                    <span class="font-weight-bold">
+                        @Model.contests[i].ContestQuestions.Count
+                    </span>
+                </p>
 
-                    }
-                    else
-                    {
-                        <div class="progress">
-                            @if (Model.contests[i].isActive)
-                            {
-                                <div class="progress-bar bg-success" role="progressbar"
-                                     style="width: @(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)%"
-                                     aria-valuenow="@(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)"
-                                     aria-valuemin="0" aria-valuemax="100"></div>
-                            }
-                            else
-                            {
-                                <div class="progress-bar bg-secondary" role="progressbar"
-                                     style="width: @(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)%"
-                                     aria-valuenow="@(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100)"
-                                     aria-valuemin="0" aria-valuemax="100"></div>
-                            }
+                <div class="progress progress-inactive">
+                    <div class="progress-bar bg-success" role="progressbar"
+                         style="width: @((int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))%"
+                         aria-valuenow="@((int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))"
+                         aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-danger" role="progressbar"
+                         style="width: @(100 - (int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))%"
+                         aria-valuenow="@(100 - (int)(((double)Model.correctAnswersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))"
+                         aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            }
+            else
+            {
+                <p>
+                    Odpovedali ste na @Model.answersCount[i] z @Model.contests[i].ContestQuestions.Count otázok
+                </p>
 
-                        </div>
-                        <span>Odpovedali ste na @Model.answersCount[i] z @Model.contests[i].ContestQuestions.Count otázok</span>
-                    }
-                </td>
-                <td class="text-center">
-                    @if (Model.contests[i].isActive)
-                    {
-                        <span class="text-success font-weight-bold">Súťaž práve prebieha</span>
-                    }
-                    else
-                    {
-                        <span>Súťaž skončila</span>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                <div class="progress">
+                    <div class="progress-bar bg-info" role="progressbar"
+                         style="width: @((int)(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))%"
+                         aria-valuenow="@((int)(((double)Model.answersCount[i] / Model.contests[i].ContestQuestions.Count) * 100))"
+                         aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            }
+        </div>
+    }
+}
+
+
+<script src="~/lib/qr-scanner/jsQR.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -223,4 +182,57 @@
             "searching": false
         });
     });
+
+    var video = document.createElement("video");
+    var canvasElement = document.getElementById("canvas");
+    var canvas = canvasElement.getContext("2d");
+    var loadingMessage = document.getElementById("loadingMessage");
+    //var outputContainer = document.getElementById("output");
+    //var outputMessage = document.getElementById("outputMessage");
+    //var outputData = document.getElementById("outputData");
+
+    function drawLine(begin, end, color) {
+        canvas.beginPath();
+        canvas.moveTo(begin.x, begin.y);
+        canvas.lineTo(end.x, end.y);
+        canvas.lineWidth = 4;
+        canvas.strokeStyle = color;
+        canvas.stroke();
+    }
+
+    // Use facingMode: environment to attemt to get the front camera on phones
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function (stream) {
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+        video.play();
+        requestAnimationFrame(tick);
+    });
+
+    function tick() {
+        loadingMessage.innerText = "⌛ Loading video..."
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            loadingMessage.hidden = true;
+            canvasElement.hidden = false;
+            //outputContainer.hidden = false;
+
+
+            canvasElement.height = video.videoWidth;
+            canvasElement.width = video.videoWidth;
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+            var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+            var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: "dontInvert",
+            });
+            if (code) {
+                drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+                drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+                drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+                drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+                //window.location.replace(code.data);
+                window.location.href = code.data;
+            }
+        }
+        requestAnimationFrame(tick);
+    }
 </script>
+

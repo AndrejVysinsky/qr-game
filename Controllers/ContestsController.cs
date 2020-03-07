@@ -254,26 +254,15 @@ namespace QuizWebApp.Controllers
         public ActionResult Activate(int id)
         {
             var contest = _context.Contests.SingleOrDefault(q => q.Id == id);
-            var contests = _context.Contests.ToList();
 
             if (contest == null)
                 return NotFound();
 
             if (contest.isActive)
-            {
                 contest.isActive = false;
-            }
             else
-            {
-                foreach (var c in contests)
-                {
-                    if (c.isActive)
-                    {
-                        c.isActive = false;
-                    }
-                }
                 contest.isActive = true;
-            }
+            
             _context.SaveChanges();
 
             return RedirectToAction("Index");

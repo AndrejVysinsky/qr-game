@@ -14,66 +14,46 @@
 <div>
     <h3>O stránke</h3>
     <br />
-    <p><b>FRI QR Kvíz</b> je webová aplikácia vytvorená na <a href="https://www.fri.uniza.sk/">Fakulte riadenia a informatiky</a>. </p>
+    <p><b>FRI QR Kvíz</b> je webová aplikácia vytvorená na <a href="https://www.fri.uniza.sk/" class="alert-link">Fakulte riadenia a informatiky</a>. </p>
     <p>
         Jedná sa o interaktívnu kvízovú hru, v ktorej si overíte Vaše vedomosti, a zároveň hráte o zaujímavé ceny.
+        
+        Hra je riešená tak, že sa náhodne rozmiestnia otázky na mieste konania súťaže, na ktorých nájdete názov súťaže, číslo otázky a príslušný QR kód.
+        Po jeho naskenovaní Vás presmeruje na príslušnú otázku, na ktorú treba odpovedať.
+        Cieľom hry je teda nájsť všetky otázky a odpovedať správne na čo najviac z nich. Čím viac správnych odpovedí, tým máte väčšiu šancu vyhrať.
 
-        Podstata hry je jednoduchá. Po fakulte môžete nájsť vyvesené QR kódy s názvom súťaže a číslom otázky,
-        ktoré keď naskenujete, tak Vás presmerujú na otázku, na ktorú musíte odpovedať.
-
-        Cieľ hry je teda nájsť všetky otázky a odpovedať správne na čo najviac z nich. Čím viac správnych odpovedí, tým máte väčšiu šancu niečo vyhrať.
-
-        Svoj postup v súťaži môžete sledovať v záložke <b>Moje súťaže</b>. Po odpovedaní na všetky otázky sa Vám zobrazí počet správnych odpovedí.
+        Svoj postup v súťaži môžete sledovať v záložke
+        <a asp-controller="User" asp-action="MyContests" class="alert-link">Moje súťaže</a>. 
+        Po odpovedaní na všetky otázky sa Vám zobrazí počet správnych odpovedí.
     </p>
     <p>
         Prajeme Vám veľa šťastia. :)
     </p>
 
+    <br />
+
+    <h4>Ako skenovať QR kódy</h4>
+    
+    <p>QR kódy môžete skenovať viacerými spôsobmi.</p>
+
     <p>
-        <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-            Naskenovanie QR kódu
-        </button>
+        V záložke
+        <a asp-controller="User" asp-action="MyContests" class="alert-link">Moje súťaže</a>
+        môžete nájsť tlačidlo <b>Skenovanie QR kódov</b>, ktoré Vás vyzve na povolenie kamery.
+        Stačí potom už len namieriť na QR kód a presmeruje Vás automaticky na danú otázku.
     </p>
-    <div class="collapse" id="collapseExample">
-        <div class="card card-body">
-            <p>
-                Pre zapojenie sa do súťaže je nutné mať v mobile skener QR kódov. Ak máte aspoň <b>Adroid 9</b> alebo <b>iOS 11</b>,
-                skener už máte zabudovaný v kamere. Stačí iba otvoriť kameru, namieriť na QR kód a vaše zariadenie ho automaticky rozpozná.
-            </p>
-            <p>
-                V prípade, že nemáte skener zabudovaný v mobile, na <b>Google Play</b> alebo <b>App Store</b> môžete nájsť aplikácie na skenovanie QR kódov.
-            </p>
-            <p>
-                Jediné čo už ostáva je zúčastniť sa jednej z našich súťaží a odpovedať na čo najviac otázok správne. :)
-            </p>
-        </div>
-    </div>
+
+    <p>
+        Pokiaľ by ste chceli využiť iný spôsob skenovania QR kódov, tak zariadenia, ktoré majú aspoň
+        <b>Adroid 9</b> alebo <b>iOS 11</b> majú skener zabudovaný v kamere. 
+        Stačí teda otvoriť kameru, namieriť na QR kód a vaše zariadenie ho automaticky rozpozná.
+    </p>
+
+    <p>
+        V prípade, že máte staršiu verziu operačného systému, môžete si stiahnuť aplikáciu na skenovanie QR kódov z <b>Google Play</b> alebo <b>App Store</b>.
+    </p>
 
 </div>
-
-@*<div class="text-center">
-    <h1 class="display-4">Vitajte</h1>
-    <br />
-    <p class="lead">
-        Pre vyplnenie otázok sa musíte <span class="font-weight-bold">registrovať</span> alebo <span class="font-weight-bold">prihlásiť s existujúcim účtom</span> a naskenovať príslušný QR kód.
-    </p>
-    <p class="lead">
-        Keď odpoviete na všetky otázky danej súťaže, zobrazí sa Vám výsledné skóre.
-    </p>
-    <p class="lead">
-        Stav svojich odpovedí môžete sledovať cez možnosť <span class="font-weight-bold">Moje súťaže</span>.
-    </p>
-    <br />
-    <p class="lead">
-        Na otázku nie je možné odpovedať ak:
-    </p>
-    <p class="lead">
-        1. Ste na ňu už raz odpovedali
-    </p>
-    <p class="lead">
-        2. Súťaž nie je aktívna
-    </p>
-</div>*@
 
 <br />
 <div class="text-center">

@@ -134,7 +134,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
         {
             returnUrl = returnUrl ?? Url.Content("~/");
 
-            int newID = generateGuestID();
+            int newID = GenerateGuestID();
             string guestEmail = "guest" + newID + "@frivia.sk";
             
             var user = new ApplicationUser { UserName = guestEmail, Email = guestEmail, isTemporary = true };
@@ -155,20 +155,9 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
             return LocalRedirect(returnUrl);
         }
 
-        public int generateGuestID()
+        public int GenerateGuestID()
         {
-
-            //zle zoradi dvojciferne oproti jednocifernym
-            /*var users = _context.ApplicationUsers.Where(ap => ap.isTemporary == true).OrderBy(ap => ap.Email).ToList();
-
-            if (users.Count == 0)
-                return 1;
-
-            string lastEmail = users.Last().Email;
-            string extractNumber = Regex.Match(lastEmail, @"\d+").Value;
-            int id = Int32.Parse(extractNumber);*/
-
-            var users = _context.ApplicationUsers.Where(ap => ap.isTemporary == true).ToList();
+            var users = _context.ApplicationUsers.Where(ap => ap.isTemporary == true).Where(ap => ap.Email.Contains("@frivia.sk")).ToList();
 
             int max = 0;
             foreach (var user in users)
