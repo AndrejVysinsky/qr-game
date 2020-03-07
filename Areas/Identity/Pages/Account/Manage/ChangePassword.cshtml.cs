@@ -6,25 +6,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using QuizWebApp.Data;
+using Microsoft.Extensions.Logging;
 using QuizWebApp.Models;
-
 namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
 {
-    public class SetPasswordModel : PageModel
+    public class ChangePasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ApplicationDbContext _context;
+        private readonly ILogger<ChangePasswordModel> _logger;
 
-        public SetPasswordModel(
+        public ChangePasswordModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ApplicationDbContext context)
+            ILogger<ChangePasswordModel> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -35,15 +34,20 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Zadajte aktuálne heslo.")]
+            [DataType(DataType.Password)]
+            [Display(Name = "Aktuálne heslo")]
+            public string OldPassword { get; set; }
+
+            [Required(ErrorMessage = "Zadajte nové heslo.")]
             [StringLength(100, ErrorMessage = "{0} musí obsahovať od {2} do {1} znakov.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Heslo")]
+            [Display(Name = "Nové heslo")]
             public string NewPassword { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Potvrdenie hesla")]
-            [Compare("NewPassword", ErrorMessage = "Zadané heslá sa nezhodujú.")]
+            [Display(Name = "Potvrdenie nového hesla")]
+            [Compare("NewPassword", ErrorMessage = "Nové heslá sa musia zhodovať.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -56,10 +60,9 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
             }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
-
-            if (hasPassword)
+            if (!hasPassword)
             {
-                return RedirectToPage("./ChangePassword");
+                return RedirectToPage("./SetPassword");
             }
 
             return Page();
@@ -78,24 +81,19 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
-            if (!addPasswordResult.Succeeded)
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
+            if (!changePasswordResult.Succeeded)
             {
-                foreach (var error in addPasswordResult.Errors)
+                foreach (var error in changePasswordResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
                 return Page();
             }
 
-            if (!user.Email.Contains("@frivia.sk"))
-            {
-                user.isTemporary = false;
-                _context.SaveChanges();
-            }
-
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Heslo úspešne nastavené.";
+            _logger.LogInformation("User changed their password successfully.");
+            StatusMessage = "Heslo bolo úspešne zmenené.";
 
             return RedirectToPage();
         }

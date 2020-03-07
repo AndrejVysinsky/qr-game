@@ -49,8 +49,8 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             [Required]
-            [EmailAddress]
-            [Display(Name = "New email")]
+            [EmailAddress(ErrorMessage = "Zadaný email nie je platný.")]
+            [Display(Name = "Nový email")]
             public string NewEmail { get; set; }
         }
 
@@ -87,50 +87,30 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            bool emailExists = _context.ApplicationUsers.Any(user => user.Email == Input.NewEmail);
+
+            if (emailExists)
+                ModelState.AddModelError(string.Empty, "Zadaný email už existuje");
+
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
                 return Page();
             }
+            
+            var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
 
-            var email = await _userManager.GetEmailAsync(user);
-            if (Input.NewEmail != email)
+            await _userManager.ChangeEmailAsync(user, Input.NewEmail, code);         
+            await _userManager.SetUserNameAsync(user, Input.NewEmail);
+
+            if (user.PasswordHash != null)
             {
-                var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
-                await _userManager.ChangeEmailAsync(user, Input.NewEmail, code);                
-
-                await _userManager.SetUserNameAsync(user, Input.NewEmail);
-
-                if (user.PasswordHash != null)
-                {
-                    user.isTemporary = false;
-                    _context.SaveChanges();
-                }
-
-                await _signInManager.RefreshSignInAsync(user);
-                StatusMessage = "Email úspešne zmenený.";
-                return RedirectToPage();
-
-                //zakomentovana cast vyzaduje potvrdenie na zmenu emailu
-
-                /*
-                var userId = await _userManager.GetUserIdAsync(user);
-                var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
-                var callbackUrl = Url.Page(
-                    "/Account/ConfirmEmailChange",
-                    pageHandler: null,
-                    values: new { userId = userId, email = Input.NewEmail, code = code },
-                    protocol: Request.Scheme);
-                await _emailSender.SendEmailAsync(
-                    Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
-                return RedirectToPage();*/
+                user.isTemporary = false;
+                _context.SaveChanges();
             }
 
-            StatusMessage = "Email nebol zmenený.";
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "Email úspešne zmenený.";
             return RedirectToPage();
         }
 

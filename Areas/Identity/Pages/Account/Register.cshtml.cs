@@ -65,7 +65,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
+            [Display(Name = "Potvrdenie hesla")]
             [Compare("Password", ErrorMessage = "Zadané heslá sa nezhodujú.")]
             public string ConfirmPassword { get; set; }
         }
@@ -89,26 +89,10 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code },
-                        protocol: Request.Scheme);
+                    await _userManager.ConfirmEmailAsync(user, code);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Potvrďte svoj email",
-                        $"Svoj účet si aktivujete kliknutím na nasledujúci <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>odkaz</a>.\n\n" +
-                        $"Prajeme veľa šťastia a správnych odpovedí. :)");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: true);
-                        return LocalRedirect(returnUrl);
-                    }
+                    await _signInManager.SignInAsync(user, isPersistent: true);
+                    return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)
                 {
