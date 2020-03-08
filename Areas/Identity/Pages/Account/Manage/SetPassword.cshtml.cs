@@ -35,7 +35,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Zadajte heslo")]
             [StringLength(100, ErrorMessage = "{0} musí obsahovať od {2} do {1} znakov.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Heslo")]
@@ -90,7 +90,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
 
             if (!user.Email.Contains("@frivia.sk"))
             {
-                user.isTemporary = false;
+                user.IsTemporary = false;
                 _context.SaveChanges();
             }
 

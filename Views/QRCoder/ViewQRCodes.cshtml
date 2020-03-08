@@ -8,7 +8,7 @@
 
 
 
-@for (int i = 0; i < Model.qrByteData.Count; i++)
+@for (int i = 0; i < Model.QrByteData.Count; i++)
 {
     <div id="printable" class="text-center">
         <div id="innerPrintable" class="phoneImg">
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="form-group">
-                    <img width="200" src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(Model.qrByteData[i]))" />
+                    <img width="200" src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(Model.QrByteData[i]))" />
                 </div>
 
                 <br />

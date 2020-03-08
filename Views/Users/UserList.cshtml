@@ -1,0 +1,84 @@
+﻿@model QuizWebApp.ViewModels.UserListViewModel
+
+
+@using Microsoft.AspNetCore.Identity
+@{
+    ViewData["Title"] = "Odpovede";
+    int offset = 0;
+}
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+
+<h2>Zoznam používateľov</h2>
+<hr />
+<br />
+
+<form>
+    @for (int i = 0; i < Model.RoleNames.Count; i++)
+    {
+        <h3>@Model.RoleNames[i]</h3>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="width: 10%">#</th>
+                    <th style="width: 50%">Email</th>
+                    <th style="width: 30%">Zmeniť práva</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                @for (int j = offset; j < Model.RolesCount[i] + offset; j++)
+                {
+                    <tr>
+                        <td style="width: 10%">
+                            @(j + 1)
+                        </td>
+                        <td style="width: 50%">
+                            @Html.DisplayFor(a => a.UserList[j].Email)
+                        </td>
+                        <td style="width: 30%">
+                            @if (Model.RoleNames[i] != "Administrátori")
+                            {
+                                <button asp-action="PromoteUser" asp-route-id="@Model.UserList[j].Id" type="submit" formmethod="post" class="btn"
+                                        onclick="return confirm('Naozaj chcete zvýšiť práva používateľa @Model.UserList[j].Email ?')">
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                            }
+                            @if (Model.RoleNames[i] != "Používatelia" && User.Identity.Name != Model.UserList[j].Email)
+                            {
+                                <button asp-action="DemoteUser" asp-route-id="@Model.UserList[j].Id" type="submit" formmethod="post" class="btn"
+                                        onclick="return confirm('Naozaj chcete znížiť práva používateľa @Model.UserList[j].Email ?')">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <hr />
+        offset += Model.RolesCount[i];
+    }
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable({
+            "language": {
+                "lengthMenu": "Zobraz _MENU_ záznamov na stranu",
+                "zeroRecords": "Nenašli sa žiadne záznamy",
+                "info": "Strana _PAGE_ z _PAGES_",
+                "infoEmpty": "Žiadne dostupné záznamy",
+                "infoFiltered": "",
+                "search": "Hľadať",
+                "paginate": {
+                    "first": "Prvá",
+                    "last": "Posledná",
+                    "next": "Nasledujúca",
+                    "previous": "Predchádzajúca"
+                }
+            },
+            "ordering": false
+        });
+    });
+</script>
+

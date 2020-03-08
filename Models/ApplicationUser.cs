@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Claims;
@@ -14,7 +15,8 @@ namespace QuizWebApp.Models
     //[NotMapped]
     public class ApplicationUser : IdentityUser
     {
-        public bool isTemporary { get; set; }
+        public bool IsTemporary { get; set; }
+        public virtual DateTime? RegistrationDate { get; set; }
         public virtual ICollection<ContestQuestionUser> ContestQuestionUsers { get; set; }
     }
 }

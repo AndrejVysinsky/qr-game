@@ -42,7 +42,7 @@
                     <a asp-action="Delete" asp-route-id="@Model[i].Id">Vymazať</a>
                 </td>
                 <td class="text-center">
-                    @if (Model[i].isActive)
+                    @if (Model[i].IsActive)
                     {
                         <a asp-action="Activate" asp-route-id="@Model[i].Id" class="text-success font-weight-bold">Súťaž je aktívna</a>
                     }

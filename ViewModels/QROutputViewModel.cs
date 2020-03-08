@@ -8,6 +8,6 @@ namespace QuizWebApp.ViewModels
     public class QROutputViewModel
     {
         public string ContestName { get; set; }
-        public List<Byte[]> qrByteData { get; set; }
+        public List<Byte[]> QrByteData { get; set; }
     }
 }

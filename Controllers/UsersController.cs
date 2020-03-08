@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using QuizWebApp.Data;
@@ -24,15 +26,15 @@ namespace QuizWebApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly string _userId;
         private readonly IWebHostEnvironment _hostEnvironment;
-        private readonly UserManager<ApplicationUser> _manager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public UsersController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, 
-                                IWebHostEnvironment hostEnvironment, UserManager<ApplicationUser> manager)
+                                IWebHostEnvironment hostEnvironment, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             _hostEnvironment = hostEnvironment;
-            _manager = manager;
+            _userManager = userManager;
         }
 
         public ActionResult MyContests()
@@ -63,15 +65,15 @@ namespace QuizWebApp.Controllers
 
             var userViewModel = new UserViewModel()
             {
-                contests = contests,
-                answersCount = answersCount,
-                correctAnswersCount = correctAnswersCount
+                Contests = contests,
+                AnswersCount = answersCount,
+                CorrectAnswersCount = correctAnswersCount
             };
 
             return View(userViewModel);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Moderator")]
         public ActionResult Answers()
         {
             //treba zoznam užívateľov a zoznam ich odpovedí + názvy súťaží + názov otázky
@@ -88,20 +90,20 @@ namespace QuizWebApp.Controllers
 
             var answersViewModel = new AnswersViewModel()
             {
-                contestQuestionUsers = contestQuestionUsers,
-                contestList = contests,
-                userList = users
+                ContestQuestionUsers = contestQuestionUsers,
+                ContestList = contests,
+                UserList = users
             };
 
             return View(answersViewModel);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         public ActionResult FilterAnswers(AnswersViewModel viewModel, int? answerToDelete)
         {
-            var userId = viewModel.selectedUserId;
-            var contestId = viewModel.selectedContestId;
+            var userId = viewModel.SelectedUserId;
+            var contestId = viewModel.SelectedContestId;
 
             var contestQuestionUsers = _context.ContestQuestionUsers
                                                     .Include(cqu => cqu.ContestQuestion)
@@ -147,23 +149,24 @@ namespace QuizWebApp.Controllers
 
             var answersViewModel = new AnswersViewModel()
             {
-                contestQuestionUsers = contestQuestionUsers,
-                contestList = contests,
-                userList = users
+                ContestQuestionUsers = contestQuestionUsers,
+                ContestList = contests,
+                UserList = users
             };
 
             return View("Answers", answersViewModel);
-        }       
+        }
 
+        [Authorize(Roles = "Admin,Moderator")]
         public async Task<IActionResult> OnPostExport(AnswersViewModel viewModel)
         {
             var contestList = new List<Contest>();
             var userList = new List<ApplicationUser>();
 
-            if (viewModel.selectedUserId != null)
+            if (viewModel.SelectedUserId != null)
             {
                 //zvolený user
-                userList.Add(_context.ApplicationUsers.SingleOrDefault(u => u.Id == viewModel.selectedUserId));
+                userList.Add(_context.ApplicationUsers.SingleOrDefault(u => u.Id == viewModel.SelectedUserId));
             } 
             else
             {
@@ -171,13 +174,13 @@ namespace QuizWebApp.Controllers
                 userList = _context.ApplicationUsers.ToList();
             }
 
-            if (viewModel.selectedContestId != 0)
+            if (viewModel.SelectedContestId != 0)
             {
                 //jedna súťaž
-                contestList.Add(_context.Contests.SingleOrDefault(c => c.Id == viewModel.selectedContestId));
+                contestList.Add(_context.Contests.SingleOrDefault(c => c.Id == viewModel.SelectedContestId));
 
                 var cq = _context.ContestQuestions.Include(cq => cq.Question)
-                                                    .Where(cq => cq.ContestId == viewModel.selectedContestId)
+                                                    .Where(cq => cq.ContestId == viewModel.SelectedContestId)
                                                     .OrderBy(cq => cq.QuestionNumber)
                                                     .ToList();
 
@@ -326,7 +329,7 @@ namespace QuizWebApp.Controllers
                 return NotFound();
 
             //ak sutaz nie je aktivna, nezobrazuj otázku
-            if (!contestQuestion.Contest.isActive)
+            if (!contestQuestion.Contest.IsActive)
                 return RedirectToAction("ErrorPage", "Home", new { chybovaHlaska = "Je nám ľúto, ale táto súťaž momentálne nie je aktívna." });
 
             //ak uz uzivatel na otazku odpovedal
@@ -357,30 +360,122 @@ namespace QuizWebApp.Controllers
 
             int radioIndex = Int32.Parse(Request.Form["UserAnswer"]);
 
-            if (questionDb.Answers[radioIndex].IsCorrect)
+            contestQuestionDb.ContestQuestionUsers.Add(new ContestQuestionUser()
             {
-                //uzivatel odpovedal spravne
-                contestQuestionDb.ContestQuestionUsers.Add(new ContestQuestionUser()
-                {
-                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    ContestQuestion = contestQuestionDb,
-                    IsAnsweredCorrectly = true
-                });
-            }
-            else
-            {
-                //uzivatel odpovedal nespravne
-                contestQuestionDb.ContestQuestionUsers.Add(new ContestQuestionUser()
-                {
-                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    ContestQuestion = contestQuestionDb,
-                    IsAnsweredCorrectly = false
-                });
-            }
-            //ulozit zmeny
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                ContestQuestion = contestQuestionDb,
+                IsAnsweredCorrectly = questionDb.Answers[radioIndex].IsCorrect
+            });
+
             _context.SaveChanges();
 
             return RedirectToAction("MyContests");
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> UserList()
+        {
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            var moderators = await _userManager.GetUsersInRoleAsync("Moderator");
+            var users = await _userManager.GetUsersInRoleAsync("User");
+            users = users.OrderBy(user => user.IsTemporary).ToList();
+
+            var userListViewModel = new UserListViewModel
+            {
+                UserList = admins.Concat(moderators).Concat(users).ToList(),
+                RoleNames = new List<string> { "Administrátori", "Moderátori", "Používatelia" },
+                RolesCount = new List<int> { admins.Count, moderators.Count, users.Count }
+            };
+
+            return View(userListViewModel);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public ActionResult RemoveExpiredUsers()
+        {
+            var expiredUsers = _context.ApplicationUsers.Where(user => user.IsTemporary == true && (DateTime.Now - user.RegistrationDate).Value.Days >= 14);
+            _context.RemoveRange(expiredUsers);
+            _context.SaveChanges();
+            return RedirectToAction("UserList");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public ActionResult RemoveTemporaryUsers()
+        {
+            var temporaryUsers = _context.ApplicationUsers.Where(user => user.IsTemporary == true).ToList();
+            _context.RemoveRange(temporaryUsers);
+            _context.SaveChanges();
+            return RedirectToAction("UserList");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> PromoteUser(string id)
+        {
+            var user = _context.ApplicationUsers.SingleOrDefault(u => u.Id == id);
+
+            bool isModerator = await _userManager.IsInRoleAsync(user, "Moderator");
+            bool isUser = await _userManager.IsInRoleAsync(user, "User");
+
+            string newRole = string.Empty;
+            string oldRole = string.Empty;
+
+            if (isModerator)
+            {
+                oldRole = "Moderator";
+                newRole = "Admin";
+            }
+
+            if (isUser)
+            {
+                oldRole = "User";
+                newRole = "Moderator";
+            }
+
+            if (!string.IsNullOrEmpty(newRole))
+            {
+                await _userManager.RemoveFromRoleAsync(user, oldRole);
+                await _userManager.AddToRoleAsync(user, newRole);
+            }
+            
+            return RedirectToAction("UserList");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DemoteUser(string id)
+        {
+            var user = _context.ApplicationUsers.SingleOrDefault(u => u.Id == id);
+
+            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            bool isModerator = await _userManager.IsInRoleAsync(user, "Moderator");
+
+            string oldRole = string.Empty;
+            string newRole = string.Empty;
+
+            if (isAdmin)
+            {
+                oldRole = "Admin";
+                newRole = "Moderator";
+            }
+
+            if (isModerator)
+            {
+                oldRole = "Moderator";
+                newRole = "User";
+            }
+
+            if (!string.IsNullOrEmpty(newRole))
+            {
+                await _userManager.RemoveFromRoleAsync(user, oldRole);
+                await _userManager.AddToRoleAsync(user, newRole);
+            }
+
+            return RedirectToAction("UserList");
         }
     }
 }

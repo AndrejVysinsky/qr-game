@@ -12,7 +12,7 @@
         {
             <li class="nav-item">
                 <a class="nav-link @(pageUrl.ToLower().Contains("account/manage") ? "nav-link-active" : string.Empty)"
-                    asp-area="Identity" asp-page="/Account/Manage/Email" title="Manage">Vitajte @User.Identity.Name</a>
+                    asp-area="Identity" asp-page="/Account/Manage/Email" title="Manage">Vitajte @(User.Identity.Name.Substring(0, User.Identity.Name.IndexOf('@')))</a>
             </li>
             <li class="nav-item">
                 <a id="logoutLink" href="#" class="nav-link">Odhlásiť</a>

@@ -34,7 +34,7 @@ namespace QuizWebApp
             _hostEnvironment = hostEnvironment;
 
             myTimer = new Timer(24 * 60 * 60 * 1000); //one day in milliseconds
-            myTimer.Elapsed += new ElapsedEventHandler(everyDay);
+            myTimer.Elapsed += new ElapsedEventHandler(CleanUp);
             myTimer.Start();
         }
 
@@ -126,7 +126,7 @@ namespace QuizWebApp
                 endpoints.MapRazorPages();
             });
 
-            //CreateUserRoles(services).Wait();
+            CreateUserRoles(services).Wait();
         }
 
         private async Task CreateUserRoles(IServiceProvider serviceProvider)
@@ -134,22 +134,27 @@ namespace QuizWebApp
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            IdentityResult roleResult;
-            //Adding Admin Role
-            var roleCheck = await RoleManager.RoleExistsAsync("Admin");
-            if (!roleCheck)
+            bool adminExists = await RoleManager.RoleExistsAsync("Admin");
+            if (!adminExists)
             {
-                //create the roles and seed them to the database
-                roleResult = await RoleManager.CreateAsync(new IdentityRole("Admin"));
+                await RoleManager.CreateAsync(new IdentityRole("Admin"));
+
+                var user = new ApplicationUser { UserName = "admin@frivia.sk", Email = "admin@frivia.sk", RegistrationDate = DateTime.Now };
+                await UserManager.CreateAsync(user, "admin123");
+                await UserManager.AddToRoleAsync(user, "Admin");
             }
-            //Assign Admin role to the main User here we have given our newly registered 
-            //login id for Admin management
-            ApplicationUser user = await UserManager.FindByEmailAsync("admin@email.com");
-            var User = new ApplicationUser();
-            await UserManager.AddToRoleAsync(user, "Admin");
+
+            bool modExists = await RoleManager.RoleExistsAsync("Moderator");
+            if (!modExists)
+                await RoleManager.CreateAsync(new IdentityRole("Moderator"));
+
+            bool userExists = await RoleManager.RoleExistsAsync("User");
+            if (!userExists)
+                await RoleManager.CreateAsync(new IdentityRole("User")); 
+         
         }
 
-        private void everyDay(object src, ElapsedEventArgs e)
+        private void CleanUp(object src, ElapsedEventArgs e)
         {
             var tempsPath = Path.Combine(_hostEnvironment.WebRootPath, @"uploads/temps/");
 

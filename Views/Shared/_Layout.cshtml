@@ -54,14 +54,14 @@
 
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            if (User.IsInRole("Admin"))
+                            if (!User.IsInRole("User"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link @(pageUrl.ToLower().Contains("questions") ? "nav-link-active" : string.Empty)"
                                        asp-area="" asp-controller="Questions" asp-action="Index">Otázky</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(pageUrl.ToLower().Contains("/contests") ? "nav-link-active" : string.Empty)" 
+                                    <a class="nav-link @(pageUrl.ToLower().Contains("/contests") ? "nav-link-active" : string.Empty)"
                                        asp-area="" asp-controller="Contests" asp-action="Index">Súťaže</a>
                                 </li>
 
@@ -71,11 +71,19 @@
                                    asp-area="" asp-controller="Users" asp-action="MyContests">Moje súťaže</a>
                             </li>
 
-                            if (User.IsInRole("Admin"))
+                            if (!User.IsInRole("User"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link @(pageUrl.ToLower().Contains("users/answers") ? "nav-link-active" : string.Empty)"
                                        asp-area="" asp-controller="Users" asp-action="Answers">Odpovede</a>
+                                </li>
+                            }
+
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(pageUrl.ToLower().Contains("users/answers") ? "nav-link-active" : string.Empty)"
+                                       asp-area="" asp-controller="Users" asp-action="UserList">Používatelia</a>
                                 </li>
                             }
                         }

@@ -8,8 +8,8 @@ namespace QuizWebApp.ViewModels
 {
     public class UserViewModel
     {
-        public List<Contest> contests { get; set; }
-        public List<int> answersCount { get; set; }
-        public List<int> correctAnswersCount { get; set; }
+        public List<Contest> Contests { get; set; }
+        public List<int> AnswersCount { get; set; }
+        public List<int> CorrectAnswersCount { get; set; }
     }
 }

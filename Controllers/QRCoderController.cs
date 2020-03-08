@@ -12,7 +12,7 @@ using QuizWebApp.ViewModels;
 
 namespace QuizWebApp.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public class QRCoderController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -42,7 +42,7 @@ namespace QuizWebApp.Controllers
             var qrOutputViewModel = new QROutputViewModel()
             {
                 ContestName = contest.Name,
-                qrByteData = qrByteData
+                QrByteData = qrByteData
             };
 
             return View(qrOutputViewModel);

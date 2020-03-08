@@ -53,12 +53,12 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Zadajte email.")]
             [EmailAddress(ErrorMessage = "Zadaný email nie je platný.")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Zadajte heslo.")]
             [StringLength(100, ErrorMessage = "{0} musí obsahovať od {2} do {1} znakov.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Heslo")]
@@ -82,8 +82,11 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, IsTemporary = false, RegistrationDate = DateTime.Now };
                 var result = await _userManager.CreateAsync(user, Input.Password);
+
+                await _userManager.AddToRoleAsync(user, "User");
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
@@ -106,9 +109,9 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
 
         public IActionResult OnPostSend([FromBody]string useremail)
         {
-            bool exists = _context.ApplicationUsers.ToList().Exists(email => email.Email == useremail);
+            bool exists = _context.ApplicationUsers.Any(user => user.Email == useremail);
 
-            if (useremail.Contains("@frivia.sk"))
+            if (useremail.Contains("@frivia"))
                 exists = true;
 
             return new JsonResult(exists);
@@ -121,9 +124,11 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
             int newID = GenerateGuestID();
             string guestEmail = "guest" + newID + "@frivia.sk";
             
-            var user = new ApplicationUser { UserName = guestEmail, Email = guestEmail, isTemporary = true };
-
+            var user = new ApplicationUser { UserName = guestEmail, Email = guestEmail, IsTemporary = true, RegistrationDate = DateTime.Now };
+            
             var result = await _userManager.CreateAsync(user);
+            await _userManager.AddToRoleAsync(user, "User");
+
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
@@ -141,12 +146,14 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
 
         public int GenerateGuestID()
         {
-            var users = _context.ApplicationUsers.Where(ap => ap.isTemporary == true).Where(ap => ap.Email.Contains("@frivia.sk")).ToList();
+            var emails = _context.ApplicationUsers.Where(user => user.IsTemporary == true)
+                                    .Select(user => user.Email)
+                                    .Where(email => email.Contains("@frivia.sk")).ToList();
 
             int max = 0;
-            foreach (var user in users)
+            foreach (var email in emails)
             {
-                string extractNumber = Regex.Match(user.Email, @"\d+").Value;
+                string extractNumber = Regex.Match(email, @"\d+").Value;
                 int id = Int32.Parse(extractNumber);
 
                 if (id > max)

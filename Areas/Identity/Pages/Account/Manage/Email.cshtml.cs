@@ -48,7 +48,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Zadajte email.")]
             [EmailAddress(ErrorMessage = "Zadaný email nie je platný.")]
             [Display(Name = "Nový email")]
             public string NewEmail { get; set; }
@@ -105,7 +105,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
 
             if (user.PasswordHash != null)
             {
-                user.isTemporary = false;
+                user.IsTemporary = false;
                 _context.SaveChanges();
             }
 

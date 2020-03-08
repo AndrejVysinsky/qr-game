@@ -15,7 +15,7 @@ using QuizWebApp.ViewModels;
 
 namespace QuizWebApp.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public class ContestsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -122,14 +122,9 @@ namespace QuizWebApp.Controllers
         public ActionResult Details(int id)
         {
             var contest = _context.Contests.SingleOrDefault(c => c.Id == id);
-            var cq = _context.ContestQuestions.Where(cq => cq.ContestId == id).OrderBy(cq => cq.QuestionNumber).ToList();
+            var cq = _context.ContestQuestions.Include(cq => cq.Question).Where(cq => cq.ContestId == id).OrderBy(cq => cq.QuestionNumber).ToList();
 
             contest.ContestQuestions = cq;
-
-            foreach (var item in contest.ContestQuestions)
-            {
-                item.Question = _context.Questions.SingleOrDefault(q => q.Id == item.QuestionId);
-            }
 
             if (contest == null)
                 return NotFound();
@@ -258,10 +253,10 @@ namespace QuizWebApp.Controllers
             if (contest == null)
                 return NotFound();
 
-            if (contest.isActive)
-                contest.isActive = false;
+            if (contest.IsActive)
+                contest.IsActive = false;
             else
-                contest.isActive = true;
+                contest.IsActive = true;
             
             _context.SaveChanges();
 
@@ -270,15 +265,19 @@ namespace QuizWebApp.Controllers
 
         public ActionResult GenerateQRCodes(int id)
         {
-            var contestQuestions = _context.ContestQuestions.Include(cq => cq.Contest).Where(cq => cq.ContestId == id).OrderBy(cq => cq.QuestionNumber).ToList();
+            var questionIDs = _context.ContestQuestions.Include(q => q.Contest)
+                                                        .Where(q => q.ContestId == id)
+                                                        .OrderBy(q => q.QuestionNumber)
+                                                        .Select(q => q.Id)
+                                                        .ToList();
 
-            var urls = new List<string>();
-            foreach (var cq in contestQuestions)
+            var urls = new List<string>(questionIDs.Count);
+            foreach(var questionID in questionIDs)
             {
-                var actionUrl = Url.Action("QuestionForm", "Users", new { id = cq.Id });
+                var actionUrl = Url.Action("QuestionForm", "Users", new { id = questionID });
                 var url = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{actionUrl}";
                 urls.Add(url);
-            }                     
+            }
 
             return RedirectToAction("ViewQRCodes", "QRCoder", new { urls, contestId = id });
         }

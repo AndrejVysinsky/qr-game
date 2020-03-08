@@ -10,7 +10,7 @@
     <div class="form-group row">
 
         <div class="col">
-            @Html.DropDownListFor(a => a.selectedContestId, new SelectList(Model.contestList, "Id", "Name", 1), "Zvoľte súťaž",
+            @Html.DropDownListFor(a => a.SelectedContestId, new SelectList(Model.ContestList, "Id", "Name", 1), "Zvoľte súťaž",
             new
             {
                 @class = "form-control selectpicker",
@@ -21,7 +21,7 @@
         </div>
 
         <div class="col">
-            @Html.DropDownListFor(a => a.selectedUserId, new SelectList(Model.userList, "Id", "Email", 1), "Zvoľte užívateľa",
+            @Html.DropDownListFor(a => a.SelectedUserId, new SelectList(Model.UserList, "Id", "Email", 1), "Zvoľte používateľa",
             new
             {
                 @class = "form-control selectpicker",
@@ -67,30 +67,30 @@
 
         </thead>
         <tbody class="bg-white">
-            @for (int i = 0; i < Model.contestQuestionUsers.Count; i++)
+            @for (int i = 0; i < Model.ContestQuestionUsers.Count; i++)
             {
                 <tr>
                     <td>
                         @(i + 1)
                     </td>
                     <td>
-                        @Html.DisplayFor(a => a.contestQuestionUsers[i].ApplicationUser.Email)
+                        @Html.DisplayFor(a => a.ContestQuestionUsers[i].ApplicationUser.Email)
                     </td>
                     <td>
-                        @if (Model.contestQuestionUsers[i].ContestQuestion.Contest.isActive)
+                        @if (Model.ContestQuestionUsers[i].ContestQuestion.Contest.IsActive)
                         {
-                            <span class="text-success">@Html.DisplayFor(a => a.contestQuestionUsers[i].ContestQuestion.Contest.Name)</span>
+                            <span class="text-success">@Html.DisplayFor(a => a.ContestQuestionUsers[i].ContestQuestion.Contest.Name)</span>
                         }
                         else
                         {
-                            @Html.DisplayFor(a => a.contestQuestionUsers[i].ContestQuestion.Contest.Name)
+                            @Html.DisplayFor(a => a.ContestQuestionUsers[i].ContestQuestion.Contest.Name)
                         }
                     </td>
                     <td>
-                        @Html.DisplayFor(a => a.contestQuestionUsers[i].ContestQuestion.Question.Name)
+                        @Html.DisplayFor(a => a.ContestQuestionUsers[i].ContestQuestion.Question.Name)
                     </td>
                     <td class="text-center">
-                        @(Model.contestQuestionUsers[i].IsAnsweredCorrectly ? "Áno" : "Nie")
+                        @(Model.ContestQuestionUsers[i].IsAnsweredCorrectly ? "Áno" : "Nie")
                     </td>
                     <td class="text-center">
                         <input asp-action="FilterAnswers" asp-route-answerToDelete="@i" type="submit" value="X" class="btn btn-dark" formmethod="post"
@@ -101,8 +101,8 @@
         </tbody>
     </table>
 
-    @Html.HiddenFor(a => a.selectedUserId)
-    @Html.HiddenFor(a => a.selectedContestId)
+    @Html.HiddenFor(a => a.SelectedUserId)
+    @Html.HiddenFor(a => a.SelectedContestId)
 </form>
 
 <script>

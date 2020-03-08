@@ -14,7 +14,7 @@ using QuizWebApp.ViewModels;
 
 namespace QuizWebApp.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public class QuestionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -49,13 +49,7 @@ namespace QuizWebApp.Controllers
 
         public IActionResult CheckQuestionName(string questionName, int questionID)
         {
-            bool result = false;
-
-            var questions = _context.Questions.ToList();
-            foreach (var question in questions)
-                if (question.Name == questionName && question.Id != questionID)
-                    result = true;
-
+            bool result = _context.Questions.Any(q => q.Name == questionName && q.Id != questionID);
             return new JsonResult(result);
         }
 
