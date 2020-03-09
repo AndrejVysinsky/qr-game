@@ -1,0 +1,42 @@
+﻿@model QuizWebApp.ViewModels.PaginationViewModel<Question>
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 10%">
+                #
+            </th>
+            <th style="width: 40%">
+                Otázka
+            </th>
+            <th style="width: 40%" class="text-center">
+                Akcie
+            </th>
+        </tr>
+    </thead>
+    <tbody class="bg-white">
+        @for (int i = 0; i < Model.Entities.Count; i++)
+        {
+            <tr>
+                <td style="width: 10%">@(i + 1)</td>
+                <td style="width: 40%">@Html.DisplayFor(a => a.Entities[i].Name)</td>
+                <td style="width: 40%" class="text-center">
+                    <a asp-action="Edit" asp-route-id="@Model.Entities[i].Id">Upraviť</a> |
+                    <a asp-action="Details" asp-route-id="@Model.Entities[i].Id">Zobraziť</a> |
+                    <a asp-action="Delete" asp-route-id="@Model.Entities[i].Id">Vymazať</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="btn-toolbar justify-content-between">
+    <div class="form-group">
+        <span class="my-auto">Strana @Model.CurrentPage z @Model.PageCount</span>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-light"></button>
+        <button type="button" class="btn btn-light">@Model.CurrentPage</button>
+        <button type="button" class="btn btn-light">3</button>
+    </div>
+</div>

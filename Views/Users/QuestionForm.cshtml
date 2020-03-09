@@ -41,13 +41,13 @@
                     @if (Model.Question.Answers[i].Image == null)
                     {
                         <div class="col-10 col-sm-10 my-auto">
-                            @Html.DisplayFor(model => model.Question.Answers[i].Text)
+                            @Html.Raw(Model.Question.Answers[i].Text)
                         </div>
                     }
                     else
                     {
                         <div class="col-7 col-sm-7 my-auto">
-                            @Html.DisplayFor(model => model.Question.Answers[i].Text)
+                            @Html.Raw(Model.Question.Answers[i].Text)
                         </div>
 
                         <div class="col-4 col-sm-4 answerDivImg my-auto">

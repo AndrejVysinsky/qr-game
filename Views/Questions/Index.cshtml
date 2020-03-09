@@ -1,4 +1,4 @@
-﻿@model List<QuizWebApp.Models.Question>
+﻿@model QuizWebApp.ViewModels.PaginationViewModel<Question>
 
 @{
     ViewData["Title"] = "Index";
@@ -10,56 +10,56 @@
     <a asp-action="Create" class="btn btn-light">Vytvoriť novú otázku</a>
 </p>
 
-<table id="dataTable" class="table table-striped">
-    <thead class="thead-dark">
-        <tr>
-            <th>
-                #
-            </th>
-            <th>
-                Otázka
-            </th>
-            <th class="text-center">
-                Akcie
-            </th>
-        </tr>
+<div class="btn-toolbar justify-content-between">
+    <div class="btn-group">
+        <span class="my-auto">Zobraz&nbsp;</span>
+        <select id="pageLength">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+        <span class="my-auto">&nbsp;záznamov na stranu</span>
+    </div>
+    <div class="input-group">
+        <input id="searchInput" type="text" class="form-control" placeholder="Hľadať..">
+        <i id="clearInput" class="fas fa-times"></i>
+    </div>
+</div>
 
-    </thead>
-    <tbody class="bg-white">
-        @for (int i = 0; i < Model.Count; i++)
-        {
-            <tr>
-                <td>@(i + 1)</td>
-                <td>@Html.DisplayFor(a => a[i].Name)</td>
-                <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@Model[i].Id">Upraviť</a> |
-                    <a asp-action="Details" asp-route-id="@Model[i].Id">Zobraziť</a> |
-                    <a asp-action="Delete" asp-route-id="@Model[i].Id">Vymazať</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<br />
+
+<div id="partial">
+    @await Html.PartialAsync("_QuestionPartial", Model)
+</div>
+
 
 <script>
-    $(document).ready(function () {
-        $('#dataTable').DataTable( {
-            "language": {
-                "lengthMenu": "Zobraz _MENU_ záznamov na stranu",
-                "zeroRecords": "Nenašli sa žiadne záznamy",
-                "info": "Strana _PAGE_ z _PAGES_",
-                "infoEmpty": "Žiadne dostupné záznamy",
-                "infoFiltered": "",
-                "search": "Hľadať",
-                "paginate": {
-		            "first":    "Prvá",
-		            "last":     "Posledná",
-		            "next":     "Nasledujúca",
-		            "previous": "Predchádzajúca"
-	            }
-            },
-            "ordering": false
-        } );
+    $("#searchInput").on("change", function () {
+        $("#pageLength").val('5');
+        updateTable();
     });
+
+    $("#pageLength").on("change", function () {
+        updateTable();
+    });
+
+    $("#clearInput").on("click", function () {
+        $("#searchInput").val("");
+        $("#searchInput").change();
+    });
+
+    function updateTable() {
+        var searchString = $("#searchInput").val();
+        var pageLength = $("#pageLength").val();
+        $.ajax({
+            type: "GET",
+            url: "/questions/showdata",
+            data: { 'searchString': searchString, 'pageLength': pageLength, 'pageNumber': "1" },
+            success: function (result) {
+                $("#partial").html(result);
+            }
+        });
+    }
 </script>
 

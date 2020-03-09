@@ -28,11 +28,30 @@ namespace QuizWebApp.Controllers
 
         public ViewResult Index()
         {
-            var questions = _context.Questions.ToList();
+            var questionPaginationViewModel = new PaginationViewModel<Question>();
 
-            return View(questions);
+            questionPaginationViewModel.Entities = _context.Questions.Take(questionPaginationViewModel.PageLength).ToList();
+            questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Count() / questionPaginationViewModel.PageLength);
+
+            return View(questionPaginationViewModel);
         }
-                
+
+        public ActionResult ShowData(string searchString, int pageLength, int pageNumber)
+        {
+            var questionPaginationViewModel = new PaginationViewModel<Question>();
+
+            if (string.IsNullOrEmpty(searchString))
+                questionPaginationViewModel.Entities = _context.Questions.Skip((pageNumber - 1) * pageLength).Take(pageLength).ToList();
+            else
+                questionPaginationViewModel.Entities = _context.Questions.Where(q => q.Name.Contains(searchString)).Take(pageLength).ToList();
+
+            questionPaginationViewModel.PageLength = pageLength;
+            questionPaginationViewModel.CurrentPage = pageNumber;
+            questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Count() / questionPaginationViewModel.PageLength);
+
+            return PartialView("_QuestionPartial", questionPaginationViewModel);
+        }
+
         public ActionResult Create()
         {
             Question question = new Question();

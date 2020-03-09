@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
@@ -82,7 +83,7 @@
                             if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link @(pageUrl.ToLower().Contains("users/answers") ? "nav-link-active" : string.Empty)"
+                                    <a class="nav-link @(pageUrl.ToLower().Contains("users/userlist") ? "nav-link-active" : string.Empty)"
                                        asp-area="" asp-controller="Users" asp-action="UserList">Používatelia</a>
                                 </li>
                             }
