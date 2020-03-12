@@ -41,13 +41,21 @@ namespace QuizWebApp.Controllers
             var questionPaginationViewModel = new PaginationViewModel<Question>();
 
             if (string.IsNullOrEmpty(searchString))
+            {
                 questionPaginationViewModel.Entities = _context.Questions.Skip((pageNumber - 1) * pageLength).Take(pageLength).ToList();
+                questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Count() / pageLength);
+            }
             else
-                questionPaginationViewModel.Entities = _context.Questions.Where(q => q.Name.Contains(searchString)).Take(pageLength).ToList();
+            {
+                questionPaginationViewModel.Entities = _context.Questions.Where(q => q.Name.Contains(searchString)).Skip((pageNumber - 1) * pageLength).Take(pageLength).ToList();
+                questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Where(q => q.Name.Contains(searchString)).Count() / pageLength); 
+            }
+
+            if (questionPaginationViewModel.PageCount == 0)
+                questionPaginationViewModel.PageCount = 1;
 
             questionPaginationViewModel.PageLength = pageLength;
             questionPaginationViewModel.CurrentPage = pageNumber;
-            questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Count() / questionPaginationViewModel.PageLength);
 
             return PartialView("_QuestionPartial", questionPaginationViewModel);
         }

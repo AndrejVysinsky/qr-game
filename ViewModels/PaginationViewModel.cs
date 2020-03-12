@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace QuizWebApp.ViewModels
 {
-    public class PaginationViewModel<T> where T: class
+    public class PaginationViewModel<T> : PaginationBase
     {
-        public List<T> Entities { get; set; }
-        public int CurrentPage { get; set; } = 1;
-        public int PageLength { get; set; } = 5;
-        public int PageCount { get; set; }
+        public List<T> Entities { get; set; }        
     }
 }

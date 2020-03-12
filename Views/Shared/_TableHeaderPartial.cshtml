@@ -1,0 +1,33 @@
+﻿
+
+<div class="btn-toolbar justify-content-between">
+    <div class="btn-group">
+        <span class="my-auto">Zobraz&nbsp;</span>
+        <select id="pageLength">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span class="my-auto">&nbsp;záznamov na stranu</span>
+    </div>
+    <div class="input-group">
+        <input id="searchInput" type="text" class="form-control" placeholder="Hľadať..">
+        <i id="clearInput" class="fas fa-times"></i>
+    </div>
+</div>
+
+<script>
+    $("#searchInput").on("change", function () {
+        updateTable("1");
+    });
+
+    $("#pageLength").on("change", function () {
+        updateTable("1");
+    });
+
+    $("#clearInput").on("click", function () {
+        $("#searchInput").val("");
+        $("#searchInput").change();
+    });
+</script>
