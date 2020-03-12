@@ -15,14 +15,12 @@ using QuizWebApp.ViewModels;
 namespace QuizWebApp.Controllers
 {
     [Authorize(Roles = "Admin,Moderator")]
-    public class QuestionsController : Controller
+    public class QuestionsController : BaseController
     {
-        private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        public QuestionsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
+        public QuestionsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment) : base(context)
         {
-            _context = context;
             _hostEnvironment = hostEnvironment;
         }
 
@@ -36,29 +34,19 @@ namespace QuizWebApp.Controllers
             return View(questionPaginationViewModel);
         }
 
-        public ActionResult ShowData(string searchString, int pageLength, int pageNumber)
+        public ActionResult GetPartialViewData(string searchString, int pageLength, int pageNumber)
         {
-            var questionPaginationViewModel = new PaginationViewModel<Question>();
+            IQueryable<Question> query = _context.Questions;
 
-            if (string.IsNullOrEmpty(searchString))
-            {
-                questionPaginationViewModel.Entities = _context.Questions.Skip((pageNumber - 1) * pageLength).Take(pageLength).ToList();
-                questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Count() / pageLength);
-            }
-            else
-            {
-                questionPaginationViewModel.Entities = _context.Questions.Where(q => q.Name.Contains(searchString)).Skip((pageNumber - 1) * pageLength).Take(pageLength).ToList();
-                questionPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Questions.Where(q => q.Name.Contains(searchString)).Count() / pageLength); 
-            }
+            if (!string.IsNullOrEmpty(searchString))
+                query = query.Where(q => q.Name.Contains(searchString));
 
-            if (questionPaginationViewModel.PageCount == 0)
-                questionPaginationViewModel.PageCount = 1;
-
-            questionPaginationViewModel.PageLength = pageLength;
-            questionPaginationViewModel.CurrentPage = pageNumber;
+            var questionPaginationViewModel = GetViewModelData(pageLength, pageNumber, query);
 
             return PartialView("_QuestionPartial", questionPaginationViewModel);
         }
+
+        
 
         public ActionResult Create()
         {

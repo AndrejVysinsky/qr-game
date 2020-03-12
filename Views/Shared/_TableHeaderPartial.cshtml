@@ -19,15 +19,41 @@
 
 <script>
     $("#searchInput").on("change", function () {
-        updateTable("1");
+        updateTable();
     });
 
     $("#pageLength").on("change", function () {
-        updateTable("1");
+        updateTable();
     });
 
     $("#clearInput").on("click", function () {
         $("#searchInput").val("");
         $("#searchInput").change();
     });
+
+    function updateTable(pageNumber = 1) {
+        var searchString = $("#searchInput").val();
+        var pageLength = $("#pageLength").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("ShowData")',
+            data: { 'searchString': searchString, 'pageLength': pageLength, 'pageNumber': pageNumber },
+            success: function (result) {
+                $("#partial").html(result);
+            }
+        });
+    }
+
+    function updateTable(pageNumber = 1) {
+        var searchString = $("#searchInput").val();
+        var pageLength = $("#pageLength").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetPartialViewData")',
+            data: { 'searchString': searchString, 'pageLength': pageLength, 'pageNumber': pageNumber },
+            success: function (result) {
+                $("#partial").html(result);
+            }
+        });
+    }
 </script>

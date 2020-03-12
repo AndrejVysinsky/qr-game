@@ -18,18 +18,3 @@
     @await Html.PartialAsync("_QuestionPartial", Model)
 </div>
 
-<script>
-    function updateTable(pageNumber) {
-        var searchString = $("#searchInput").val();
-        var pageLength = $("#pageLength").val();
-        $.ajax({
-            type: "GET",
-            url: "/questions/showdata",
-            data: { 'searchString': searchString, 'pageLength': pageLength, 'pageNumber': pageNumber },
-            success: function (result) {
-                $("#partial").html(result);
-            }
-        });
-    }
-</script>
-

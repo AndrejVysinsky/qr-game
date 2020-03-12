@@ -8,6 +8,6 @@ namespace QuizWebApp.ViewModels
 {
     public class PaginationViewModel<T> : PaginationBase
     {
-        public List<T> Entities { get; set; }        
+        public List<T> Entities { get; set; }
     }
 }
