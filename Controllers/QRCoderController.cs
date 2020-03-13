@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
@@ -13,13 +14,10 @@ using QuizWebApp.ViewModels;
 namespace QuizWebApp.Controllers
 {
     [Authorize(Roles = "Admin,Moderator")]
-    public class QRCoderController : Controller
+    public class QRCoderController : BaseController
     {
-        private readonly ApplicationDbContext _context;
-
-        public QRCoderController(ApplicationDbContext context)
+        public QRCoderController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment) : base(context, hostEnvironment)
         {
-            _context = context;
         }
 
         public IActionResult ViewQRCodes(List<string> urls, int contestId)

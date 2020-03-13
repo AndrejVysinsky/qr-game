@@ -1,5 +1,8 @@
 ﻿@model QuizWebApp.ViewModels.PaginationViewModel<Question>
 
+@await Html.PartialAsync("_TableHeaderPartial", Model)
+
+<br />
 
 <table class="table table-striped">
     <thead class="thead-dark">

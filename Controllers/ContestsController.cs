@@ -16,22 +16,32 @@ using QuizWebApp.ViewModels;
 namespace QuizWebApp.Controllers
 {
     [Authorize(Roles = "Admin,Moderator")]
-    public class ContestsController : Controller
+    public class ContestsController : BaseController
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment _hostEnvironment;
-
-        public ContestsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
+        public ContestsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment) : base(context, hostEnvironment)
         {
-            _context = context;
-            _hostEnvironment = hostEnvironment;
         }
 
         public ViewResult Index()
         {
-            var contests = _context.Contests.ToList();
+            var contestPaginationViewModel = new PaginationViewModel<Contest>();
 
-            return View(contests);
+            contestPaginationViewModel.Entities = _context.Contests.Take(contestPaginationViewModel.PageLength).ToList();
+            contestPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Contests.Count() / contestPaginationViewModel.PageLength);
+
+            return View(contestPaginationViewModel);
+        }
+
+        public ActionResult GetPartialViewData(string searchString, int pageLength, int pageNumber)
+        {
+            IQueryable<Contest> query = _context.Contests;
+
+            if (!string.IsNullOrEmpty(searchString))
+                query = query.Where(q => q.Name.Contains(searchString));
+
+            var contestPaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
+
+            return PartialView("_ContestsPartial", contestPaginationViewModel);
         }
 
         public ActionResult Create()

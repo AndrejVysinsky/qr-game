@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using QuizWebApp.Data;
@@ -21,19 +19,15 @@ using QuizWebApp.ViewModels;
 namespace QuizWebApp.Controllers
 {
     [Authorize]
-    public class UsersController : Controller
+    public class UsersController : BaseController
     {
-        private readonly ApplicationDbContext _context;
-        private readonly string _userId;
-        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly string _signedUserID;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public UsersController(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, 
-                                IWebHostEnvironment hostEnvironment, UserManager<ApplicationUser> userManager)
+        public UsersController( ApplicationDbContext context, IWebHostEnvironment hostEnvironment,
+                                IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager) : base(context, hostEnvironment)
         {
-            _context = context;
-            _userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            _hostEnvironment = hostEnvironment;
+            _signedUserID = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             _userManager = userManager;
         }
 
@@ -49,7 +43,7 @@ namespace QuizWebApp.Controllers
                 var contestQuestionUser = _context.ContestQuestionUsers
                                                         .Include(cqu => cqu.ContestQuestion)
                                                         .Where(cqu => cqu.ContestQuestion.ContestId == contest.Id)
-                                                        .Where(cqu => cqu.UserId == _userId)
+                                                        .Where(cqu => cqu.UserId == _signedUserID)
                                                         .ToList();
 
                 answersCount.Add(contestQuestionUser.Count);
@@ -63,47 +57,71 @@ namespace QuizWebApp.Controllers
                 correctAnswersCount.Add(count);
             }
 
-            var userViewModel = new UserViewModel()
+            var myContestsViewModel = new MyContestsViewModel()
             {
                 Contests = contests,
                 AnswersCount = answersCount,
                 CorrectAnswersCount = correctAnswersCount
             };
 
-            return View(userViewModel);
+            return View(myContestsViewModel);
         }
 
         [Authorize(Roles = "Admin,Moderator")]
         public ActionResult Answers()
         {
             //treba zoznam užívateľov a zoznam ich odpovedí + názvy súťaží + názov otázky
+            var answersViewModel = new AnswersViewModel();
 
-            var contestQuestionUsers = _context.ContestQuestionUsers
+            var userAnswers = _context.ContestQuestionUsers
                                                     .Include(cqu => cqu.ContestQuestion)
                                                     .Include(cqu => cqu.ApplicationUser)
                                                     .Include(cqu => cqu.ContestQuestion.Contest)
                                                     .Include(cqu => cqu.ContestQuestion.Question)
+                                                    .Take(answersViewModel.PaginationViewModel.PageLength)
                                                     .ToList();
 
-            var contests = _context.Contests.ToList();
-            var users = _context.ApplicationUsers.ToList();
+            var contests = _context.Contests.Select(c => c.Name).ToList();
+            var users = _context.ApplicationUsers.Select(u => u.Email).ToList();
 
-            var answersViewModel = new AnswersViewModel()
-            {
-                ContestQuestionUsers = contestQuestionUsers,
-                ContestList = contests,
-                UserList = users
-            };
+            answersViewModel.PaginationViewModel.Entities = userAnswers;
+            answersViewModel.PaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.ContestQuestionUsers.Count() 
+                                                                        / answersViewModel.PaginationViewModel.PageLength);
+            answersViewModel.Contests = contests;
+            answersViewModel.Users = users;
 
             return View(answersViewModel);
+        }
+
+        public ActionResult GetPartialViewData(string searchString, int pageLength, int pageNumber)
+        {
+            IQueryable<ContestQuestionUser> query = _context.ContestQuestionUsers
+                                                    .Include(cqu => cqu.ContestQuestion)
+                                                    .Include(cqu => cqu.ApplicationUser)
+                                                    .Include(cqu => cqu.ContestQuestion.Contest)
+                                                    .Include(cqu => cqu.ContestQuestion.Question);
+
+            if (!string.IsNullOrEmpty(searchString))
+                query = query.Where(q => q.ApplicationUser.Email.Contains(searchString));
+
+            var answersViewModel = new AnswersViewModel();
+            answersViewModel.PaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
+
+            var contests = _context.Contests.Select(c => c.Name).ToList();
+            var users = _context.ApplicationUsers.Select(u => u.Email).ToList();
+
+            answersViewModel.Contests = contests;
+            answersViewModel.Users = users;
+
+            return PartialView("_AnswersPartial", answersViewModel);
         }
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         public ActionResult FilterAnswers(AnswersViewModel viewModel, int? answerToDelete)
         {
-            var userId = viewModel.SelectedUserId;
-            var contestId = viewModel.SelectedContestId;
+            var userId = "";// viewModel.SelectedUserId;
+            var contestId = 0; //viewModel.SelectedContestId;
 
             var contestQuestionUsers = _context.ContestQuestionUsers
                                                     .Include(cqu => cqu.ContestQuestion)
@@ -144,14 +162,14 @@ namespace QuizWebApp.Controllers
                 _context.SaveChanges();
             }
             
-            var contests = _context.Contests.ToList();
-            var users = _context.ApplicationUsers.ToList();
+            var contests = _context.Contests.Select(c => c.Name).ToList();
+            var users = _context.ApplicationUsers.Select(u => u.Email).ToList();
 
             var answersViewModel = new AnswersViewModel()
             {
-                ContestQuestionUsers = contestQuestionUsers,
-                ContestList = contests,
-                UserList = users
+                //Answers = contestQuestionUsers,
+                Contests = contests,
+                Users = users
             };
 
             return View("Answers", answersViewModel);
@@ -162,7 +180,7 @@ namespace QuizWebApp.Controllers
         {
             var contestList = new List<Contest>();
             var userList = new List<ApplicationUser>();
-
+            /*
             if (viewModel.SelectedUserId != null)
             {
                 //zvolený user
@@ -200,7 +218,7 @@ namespace QuizWebApp.Controllers
 
                     c.ContestQuestions = cq;
                 }
-            }
+            }*/
 
 
             string sWebRootFolder = _hostEnvironment.WebRootPath;

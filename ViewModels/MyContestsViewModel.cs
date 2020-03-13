@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuizWebApp.ViewModels
 {
-    public class UserViewModel
+    public class MyContestsViewModel
     {
         public List<Contest> Contests { get; set; }
         public List<int> AnswersCount { get; set; }

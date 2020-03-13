@@ -10,5 +10,6 @@ namespace QuizWebApp.ViewModels
         public int CurrentPage { get; set; } = 1;
         public int PageLength { get; set; } = 10;
         public int PageCount { get; set; }
+        public string SearchInput { get; set; } = "";
     }
 }

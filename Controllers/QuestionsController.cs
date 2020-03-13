@@ -17,11 +17,8 @@ namespace QuizWebApp.Controllers
     [Authorize(Roles = "Admin,Moderator")]
     public class QuestionsController : BaseController
     {
-        private readonly IWebHostEnvironment _hostEnvironment;
-
-        public QuestionsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment) : base(context)
+        public QuestionsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment) : base(context, hostEnvironment)
         {
-            _hostEnvironment = hostEnvironment;
         }
 
         public ViewResult Index()
@@ -41,12 +38,10 @@ namespace QuizWebApp.Controllers
             if (!string.IsNullOrEmpty(searchString))
                 query = query.Where(q => q.Name.Contains(searchString));
 
-            var questionPaginationViewModel = GetViewModelData(pageLength, pageNumber, query);
+            var questionPaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
 
-            return PartialView("_QuestionPartial", questionPaginationViewModel);
+            return PartialView("_QuestionsPartial", questionPaginationViewModel);
         }
-
-        
 
         public ActionResult Create()
         {

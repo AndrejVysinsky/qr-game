@@ -10,7 +10,7 @@
     <div class="form-group row">
 
         <div class="col">
-            @Html.DropDownListFor(a => a.SelectedContestId, new SelectList(Model.ContestList, "Id", "Name", 1), "Zvoľte súťaž",
+            @Html.DropDownListFor(a => a.SelectedContest, new SelectList(Model.Contests, 1), "Zvoľte súťaž",
             new
             {
                 @class = "form-control selectpicker",
@@ -21,7 +21,7 @@
         </div>
 
         <div class="col">
-            @Html.DropDownListFor(a => a.SelectedUserId, new SelectList(Model.UserList, "Id", "Email", 1), "Zvoľte používateľa",
+            @Html.DropDownListFor(a => a.SelectedUser, new SelectList(Model.Users, 1), "Zvoľte používateľa",
             new
             {
                 @class = "form-control selectpicker",
@@ -41,89 +41,6 @@
     </div>
 </form>
 
-<form>
-    <table id="dataTable" class="table table-striped">
-        <thead class="thead-dark">
-            <tr>
-                <th>
-                    #
-                </th>
-                <th>
-                    Email
-                </th>
-                <th>
-                    Súťaž
-                </th>
-                <th>
-                    Otázka
-                </th>
-                <th class="text-center">
-                    Správne
-                </th>
-                <th>
-
-                </th>
-            </tr>
-
-        </thead>
-        <tbody class="bg-white">
-            @for (int i = 0; i < Model.ContestQuestionUsers.Count; i++)
-            {
-                <tr>
-                    <td>
-                        @(i + 1)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(a => a.ContestQuestionUsers[i].ApplicationUser.Email)
-                    </td>
-                    <td>
-                        @if (Model.ContestQuestionUsers[i].ContestQuestion.Contest.IsActive)
-                        {
-                            <span class="text-success">@Html.DisplayFor(a => a.ContestQuestionUsers[i].ContestQuestion.Contest.Name)</span>
-                        }
-                        else
-                        {
-                            @Html.DisplayFor(a => a.ContestQuestionUsers[i].ContestQuestion.Contest.Name)
-                        }
-                    </td>
-                    <td>
-                        @Html.DisplayFor(a => a.ContestQuestionUsers[i].ContestQuestion.Question.Name)
-                    </td>
-                    <td class="text-center">
-                        @(Model.ContestQuestionUsers[i].IsAnsweredCorrectly ? "Áno" : "Nie")
-                    </td>
-                    <td class="text-center">
-                        <input asp-action="FilterAnswers" asp-route-answerToDelete="@i" type="submit" value="X" class="btn btn-dark" formmethod="post"
-                               onclick="return confirm('Naozaj chcete odstrániť odpoveď ?')" />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    @Html.HiddenFor(a => a.SelectedUserId)
-    @Html.HiddenFor(a => a.SelectedContestId)
-</form>
-
-<script>
-    $(document).ready(function () {
-        $('#dataTable').DataTable({
-            "language": {
-                "lengthMenu": "Zobraz _MENU_ záznamov na stranu",
-                "zeroRecords": "Nenašli sa žiadne záznamy",
-                "info": "Strana _PAGE_ z _PAGES_",
-                "infoEmpty": "Žiadne dostupné záznamy",
-                "infoFiltered": "",
-                "search": "Hľadať",
-                "paginate": {
-                    "first": "Prvá",
-                    "last": "Posledná",
-                    "next": "Nasledujúca",
-                    "previous": "Predchádzajúca"
-                }
-            },
-            "ordering": false
-        });
-    });
-</script>
-
+<div id="partial">
+    @await Html.PartialAsync("_AnswersPartial", Model.PaginationViewModel)
+</div>

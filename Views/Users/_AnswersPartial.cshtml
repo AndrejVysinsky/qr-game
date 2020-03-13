@@ -1,0 +1,66 @@
+﻿@model QuizWebApp.ViewModels.PaginationViewModel<ContestQuestionUser>
+
+@await Html.PartialAsync("_TableHeaderPartial", Model)
+
+<br />
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Súťaž
+            </th>
+            <th>
+                Otázka
+            </th>
+            <th class="text-center">
+                Správne
+            </th>
+            <th>
+
+            </th>
+        </tr>
+
+    </thead>
+    <tbody class="bg-white">
+        @for (int i = 0; i < Model.Entities.Count; i++)
+        {
+            <tr>
+                <td>
+                    @(i + 1)
+                </td>
+                <td>
+                    @Html.DisplayFor(a => a.Entities[i].ApplicationUser.Email)
+                </td>
+                <td>
+                    @if (Model.Entities[i].ContestQuestion.Contest.IsActive)
+                    {
+                        <span class="text-success">@Html.DisplayFor(a => a.Entities[i].ContestQuestion.Contest.Name)</span>
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(a => a.Entities[i].ContestQuestion.Contest.Name)
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(a => a.Entities[i].ContestQuestion.Question.Name)
+                </td>
+                <td class="text-center">
+                    @(Model.Entities[i].IsAnsweredCorrectly ? "Áno" : "Nie")
+                </td>
+                <td class="text-center">
+                    <input asp-action="FilterEntities" asp-route-answerToDelete="@i" type="submit" value="X" class="btn btn-dark" formmethod="post"
+                           onclick="return confirm('Naozaj chcete odstrániť odpoveď ?')" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@await Html.PartialAsync("_TableFooterPartial", Model)

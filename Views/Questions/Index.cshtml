@@ -10,11 +10,6 @@
     <a asp-action="Create" class="btn btn-light">Vytvoriť novú otázku</a>
 </p>
 
-@await Html.PartialAsync("_TableHeaderPartial")
-
-<br />
-
 <div id="partial">
-    @await Html.PartialAsync("_QuestionPartial", Model)
+    @await Html.PartialAsync("_QuestionsPartial", Model)
 </div>
-

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizWebApp.Data;
@@ -13,13 +14,14 @@ namespace QuizWebApp.Controllers
     public class BaseController : Controller
     {
         protected readonly ApplicationDbContext _context;
+        protected readonly IWebHostEnvironment _hostEnvironment;
 
-        public BaseController(ApplicationDbContext context)
+        public BaseController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
         }
 
-        public PaginationViewModel<T> GetViewModelData<T>(int pageLength, int pageNumber, IQueryable<T> query)
+        public PaginationViewModel<T> GetViewModelData<T>(string searchString, int pageLength, int pageNumber, IQueryable<T> query)
         {
             //query je bud cely DbSet<T>, alebo uz odfiltrovany pomocou .Where() ak bol searchString != null
 
@@ -33,6 +35,7 @@ namespace QuizWebApp.Controllers
 
             paginationViewModel.PageLength = pageLength;
             paginationViewModel.CurrentPage = pageNumber;
+            paginationViewModel.SearchInput = searchString;
 
             return paginationViewModel;
         }
