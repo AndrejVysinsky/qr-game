@@ -166,14 +166,23 @@ namespace QuizWebApp.Controllers
                 foreach (var c in contestList)
                 {
                     var cq = _context.ContestQuestions.Include(cq => cq.Question)
-                                                    .Where(cq => cq.ContestId == c.Id)
-                                                    .OrderBy(cq => cq.QuestionNumber)
-                                                    .ToList();
+                                                        .Where(cq => cq.ContestId == c.Id)
+                                                        .OrderBy(cq => cq.QuestionNumber)
+                                                        .ToList();
 
                     c.ContestQuestions = cq;
                 }
             }
 
+            /*
+                ak existuje filter podla sútaže sprav iba jeden Sheet
+                ak neexistuje sprav samostatný sheet pre každú súťaž
+
+                ak existuje filter podla užívateľa zapíš len jedno otázky pre každú súťaž
+                ak neexistuje vypíš všetkých
+
+                ak existujú oba filtre tak vypíš jeden hárok (jedna súťaž) pre jedného užívateľa
+            */
 
             string webRootFolder = _hostEnvironment.WebRootPath;
             string fileName = @"Odpovede.xlsx";
@@ -191,24 +200,16 @@ namespace QuizWebApp.Controllers
                 {
                     excelSheet = workbook.CreateSheet(contest.Name);
                     row = excelSheet.CreateRow(0);
-                    
+
                     row.CreateCell(0).SetCellValue("");
                     int i = 1;
                     foreach (var contestQuestion in contest.ContestQuestions)
                     {
-                        row.CreateCell(i).SetCellValue(contestQuestion.QuestionNumber);
+                        row.CreateCell(i).SetCellValue(contestQuestion.QuestionNumber + ". " + contestQuestion.Question.Name);
                         i++;
                     }
-                    row = excelSheet.CreateRow(1);
-
-                    row.CreateCell(0).SetCellValue("");
-                    i = 1;
-                    foreach (var contestQuestion in contest.ContestQuestions)
-                    {
-                        row.CreateCell(i).SetCellValue(contestQuestion.Question.Name);
-                        i++;
-                    }
-                    row.CreateCell(i).SetCellValue("Počet správnych odpovedí");
+                    row.CreateCell(i + 1).SetCellValue("Počet správnych odpovedí");
+                    row.CreateCell(i + 2).SetCellValue("Úspešnosť (v %)");
 
                     row = excelSheet.CreateRow(2);
 
@@ -233,7 +234,7 @@ namespace QuizWebApp.Controllers
                         i = 1;
 
                         int correctCount = 0;
-                        int b = 0;
+                        int b = 0; //index pre zoznam odpovedi pouzivatela (userAnswers)
                         for (int a = 0; a < contest.ContestQuestions.Count; a++)
                         {
                             if (b < userAnswers.Count && contest.ContestQuestions[a].Id == userAnswers[b].ContestQuestionId)
@@ -255,34 +256,30 @@ namespace QuizWebApp.Controllers
                             }
                             i++;
                         }
-                        
-                        row.CreateCell(i).SetCellValue(correctCount);
 
                         if (userAnswers.Count < contest.ContestQuestions.Count)
+                        {
                             row.CreateCell(i + 1).SetCellValue("Nedokončil");
+                        }
+                        else
+                        {
+                            row.CreateCell(i + 1).SetCellValue(correctCount);
+                            row.CreateCell(i + 2).SetCellValue(Math.Round(((double)correctCount / contest.ContestQuestions.Count) * 100, 2));
+                        }
 
                         row = excelSheet.CreateRow(rowNumber);
                         rowNumber++;
                     }
-
-                }
-
-                /*
-                    ak existuje filter podla sútaže sprav iba jeden Sheet
-                    ak neexistuje sprav samostatný sheet pre každú súťaž
-
-                    ak existuje filter podla užívateľa zapíš len jedno otázky pre každú súťaž
-                    ak neexistuje vypíš všetkých
-
-                    ak existujú oba filtre tak vypíš jeden hárok (jedna súťaž) pre jedného užívateľa
-                 */
+                }                
 
                 workbook.Write(stream);
             }
+
             using (var stream = new FileStream(Path.Combine(webRootFolder, fileName), FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
             }
+
             memory.Position = 0;
             return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
