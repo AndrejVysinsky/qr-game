@@ -6,41 +6,7 @@
 
 <h2>Zoznam odpovedí</h2>
 <br />
-<form>
-    <div class="form-group row">
-
-        <div class="col">
-            @Html.DropDownListFor(a => a.SelectedContest, new SelectList(Model.Contests, 1), "Zvoľte súťaž",
-            new
-            {
-                @class = "form-control selectpicker",
-                data_live_search = "true",
-                data_live_search_style = "startsWith",
-                data_live_search_normalize = "true"
-            })
-        </div>
-
-        <div class="col">
-            @Html.DropDownListFor(a => a.SelectedUser, new SelectList(Model.Users, 1), "Zvoľte používateľa",
-            new
-            {
-                @class = "form-control selectpicker",
-                data_live_search = "true",
-                data_live_search_style = "startsWith",
-                data_live_search_normalize = "true"
-            })
-        </div>
-
-        <div class="col">
-            <input asp-action="FilterAnswers" type="submit" value="Filtrovať" class="btn btn-light" formmethod="post" />
-        </div>
-        <div class="col-auto">
-            <input asp-action="OnPostExport" type="submit" value="Exportovať ako xlsx" class="btn btn-success" formmethod="post"
-                   onclick="return confirm('Naozaj si prajete exportovať zoznam do excelu ?')" />
-        </div>
-    </div>
-</form>
 
 <div id="partial">
-    @await Html.PartialAsync("_AnswersPartial", Model.PaginationViewModel)
+    @await Html.PartialAsync("_AnswersPartial", Model)
 </div>

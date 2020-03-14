@@ -19,6 +19,7 @@ namespace QuizWebApp.Controllers
         public BaseController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         public PaginationViewModel<T> GetViewModelData<T>(string searchString, int pageLength, int pageNumber, IQueryable<T> query)

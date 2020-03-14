@@ -93,7 +93,8 @@ namespace QuizWebApp.Controllers
             return View(answersViewModel);
         }
 
-        public ActionResult GetPartialViewData(string searchString, int pageLength, int pageNumber)
+        [Authorize(Roles = "Admin,Moderator")]
+        public ActionResult GetPartialViewData(string userEmail, string contestName, string searchString, int pageLength, int pageNumber)
         {
             IQueryable<ContestQuestionUser> query = _context.ContestQuestionUsers
                                                     .Include(cqu => cqu.ContestQuestion)
@@ -104,6 +105,14 @@ namespace QuizWebApp.Controllers
             if (!string.IsNullOrEmpty(searchString))
                 query = query.Where(q => q.ApplicationUser.Email.Contains(searchString));
 
+            if (!string.IsNullOrEmpty(userEmail))
+                query = query.Where(q => q.ApplicationUser.Email.Contains(userEmail));
+
+            if (!string.IsNullOrEmpty(contestName))
+                query = query.Where(q => q.ContestQuestion.Contest.Name.Contains(contestName));
+
+            //var answersPaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
+
             var answersViewModel = new AnswersViewModel();
             answersViewModel.PaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
 
@@ -112,79 +121,23 @@ namespace QuizWebApp.Controllers
 
             answersViewModel.Contests = contests;
             answersViewModel.Users = users;
+            answersViewModel.SelectedUser = userEmail;
+            answersViewModel.SelectedContest = contestName;
 
             return PartialView("_AnswersPartial", answersViewModel);
         }
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
-        public ActionResult FilterAnswers(AnswersViewModel viewModel, int? answerToDelete)
-        {
-            var userId = "";// viewModel.SelectedUserId;
-            var contestId = 0; //viewModel.SelectedContestId;
-
-            var contestQuestionUsers = _context.ContestQuestionUsers
-                                                    .Include(cqu => cqu.ContestQuestion)
-                                                    .Include(cqu => cqu.ApplicationUser)
-                                                    .Include(cqu => cqu.ContestQuestion.Contest)
-                                                    .Include(cqu => cqu.ContestQuestion.Question)
-                                                    .ToList();
-
-            if (userId == null && contestId == 0)
-            {
-                contestQuestionUsers = contestQuestionUsers.ToList();
-            }
-            else if (userId == null && contestId != 0)
-            {
-                contestQuestionUsers = contestQuestionUsers.Where(cqu => cqu.ContestQuestion.ContestId == contestId)
-                                                            .ToList();
-            }
-            else if (userId != null && contestId == 0)
-            {
-                contestQuestionUsers = contestQuestionUsers.Where(cqu => cqu.UserId == userId)
-                                                            .ToList();
-            }
-            else
-            {
-                contestQuestionUsers = contestQuestionUsers.Where(cqu => cqu.ContestQuestion.ContestId == contestId)
-                                                            .Where(cqu => cqu.UserId == userId)
-                                                            .ToList();
-            }
-
-            //vymazanie
-            if (answerToDelete != null)
-            {
-                int index = (int)answerToDelete;
-
-                ContestQuestionUser cqu = contestQuestionUsers[index];
-                contestQuestionUsers.RemoveAt(index);
-                _context.Remove(cqu);
-                _context.SaveChanges();
-            }
-            
-            var contests = _context.Contests.Select(c => c.Name).ToList();
-            var users = _context.ApplicationUsers.Select(u => u.Email).ToList();
-
-            var answersViewModel = new AnswersViewModel()
-            {
-                //Answers = contestQuestionUsers,
-                Contests = contests,
-                Users = users
-            };
-
-            return View("Answers", answersViewModel);
-        }
-
-        [Authorize(Roles = "Admin,Moderator")]
-        public async Task<IActionResult> OnPostExport(AnswersViewModel viewModel)
+        public async Task<IActionResult> ExportDataToExcel(string userEmail, string contestName)
         {
             var contestList = new List<Contest>();
             var userList = new List<ApplicationUser>();
-            /*
-            if (viewModel.SelectedUserId != null)
+            
+            if (!string.IsNullOrEmpty(userEmail))
             {
                 //zvolený user
-                userList.Add(_context.ApplicationUsers.SingleOrDefault(u => u.Id == viewModel.SelectedUserId));
+                userList.Add(_context.ApplicationUsers.SingleOrDefault(u => u.Email == userEmail));
             } 
             else
             {
@@ -192,13 +145,14 @@ namespace QuizWebApp.Controllers
                 userList = _context.ApplicationUsers.ToList();
             }
 
-            if (viewModel.SelectedContestId != 0)
+            if (!string.IsNullOrEmpty(contestName))
             {
                 //jedna súťaž
-                contestList.Add(_context.Contests.SingleOrDefault(c => c.Id == viewModel.SelectedContestId));
+                contestList.Add(_context.Contests.SingleOrDefault(c => c.Name == contestName));
 
                 var cq = _context.ContestQuestions.Include(cq => cq.Question)
-                                                    .Where(cq => cq.ContestId == viewModel.SelectedContestId)
+                                                    .Include(cq => cq.Contest)
+                                                    .Where(cq => cq.Contest.Name == contestName)
                                                     .OrderBy(cq => cq.QuestionNumber)
                                                     .ToList();
 
@@ -218,20 +172,18 @@ namespace QuizWebApp.Controllers
 
                     c.ContestQuestions = cq;
                 }
-            }*/
+            }
 
 
-            string sWebRootFolder = _hostEnvironment.WebRootPath;
-            string sFileName = @"Odpovede.xlsx";
-            string URL = string.Format("{0}://{1}/{2}", Request.Scheme, Request.Host, sFileName);
-            FileInfo file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
+            string webRootFolder = _hostEnvironment.WebRootPath;
+            string fileName = @"Odpovede.xlsx";
+            string url = string.Format("{0}://{1}/{2}", Request.Scheme, Request.Host, fileName);
+            FileInfo file = new FileInfo(Path.Combine(webRootFolder, fileName));
             var memory = new MemoryStream();
-            using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
+
+            using (var stream = new FileStream(Path.Combine(webRootFolder, fileName), FileMode.Create, FileAccess.Write))
             {
-                IWorkbook workbook;
-                workbook = new XSSFWorkbook();
-                // ISheet excelSheet = workbook.CreateSheet("Demo");
-                //IRow row = excelSheet.CreateRow(0);
+                IWorkbook workbook = new XSSFWorkbook();
                 ISheet excelSheet;
                 IRow row;
 
@@ -265,8 +217,6 @@ namespace QuizWebApp.Controllers
                     
                     foreach (var user in userList)
                     {
-                        row.CreateCell(0).SetCellValue(user.Email);
-                        
                         var userAnswers = _context.ContestQuestionUsers
                                                     .Include(cqu => cqu.ApplicationUser)
                                                     .Where(cqu => cqu.ApplicationUser.Id == user.Id)
@@ -274,6 +224,11 @@ namespace QuizWebApp.Controllers
                                                     .Where(cqu => cqu.ContestQuestion.ContestId == contest.Id)
                                                     .OrderBy(cqu => cqu.ContestQuestion.QuestionNumber)
                                                     .ToList();
+
+                        if (userAnswers.Count == 0)
+                            continue;
+
+                        row.CreateCell(0).SetCellValue(user.Email);
 
                         i = 1;
 
@@ -304,12 +259,7 @@ namespace QuizWebApp.Controllers
                         row.CreateCell(i).SetCellValue(correctCount);
 
                         if (userAnswers.Count < contest.ContestQuestions.Count)
-                        { 
-                            if (userAnswers.Count == 0)
-                                row.CreateCell(i + 1).SetCellValue("Nezúčastnil sa");
-                            else
-                                row.CreateCell(i + 1).SetCellValue("Nedokončil");
-                        }                                                 
+                            row.CreateCell(i + 1).SetCellValue("Nedokončil");
 
                         row = excelSheet.CreateRow(rowNumber);
                         rowNumber++;
@@ -327,14 +277,14 @@ namespace QuizWebApp.Controllers
                     ak existujú oba filtre tak vypíš jeden hárok (jedna súťaž) pre jedného užívateľa
                  */
 
-                workbook.Write(fs);
+                workbook.Write(stream);
             }
-            using (var stream = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+            using (var stream = new FileStream(Path.Combine(webRootFolder, fileName), FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
             }
             memory.Position = 0;
-            return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
+            return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
 

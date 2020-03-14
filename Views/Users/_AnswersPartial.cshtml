@@ -1,6 +1,42 @@
-﻿@model QuizWebApp.ViewModels.PaginationViewModel<ContestQuestionUser>
+﻿@model QuizWebApp.ViewModels.AnswersViewModel
 
-@await Html.PartialAsync("_TableHeaderPartial", Model)
+
+<div class="form-group row">
+    <div class="col">
+        @Html.DropDownListFor(a => a.SelectedUser, new SelectList(Model.Users, 1), "Zvoľte používateľa",
+        new
+        {
+            id = "selectedUser",
+            @class = "form-control selectpicker",
+            data_live_search = "true",
+            data_live_search_style = "startsWith",
+            data_live_search_normalize = "true"
+        })
+    </div>
+    <div class="col">
+        @Html.DropDownListFor(a => a.SelectedContest, new SelectList(Model.Contests, 1), "Zvoľte súťaž",
+        new
+        {
+            id = "selectedContest",
+            @class = "form-control selectpicker",
+            data_live_search = "true",
+            data_live_search_style = "startsWith",
+            data_live_search_normalize = "true"
+        })
+    </div>
+    <div class="col">
+        <input id="filterAnswers" type="submit" value="Filtrovať" class="btn btn-light" />
+    </div>
+    <div class="col-auto">
+        <form>
+            <input type="submit" formmethod="post" value="Exportovať ako xlsx" class="btn btn-success"
+                   asp-action="ExportDataToExcel" asp-route-userEmail="@Model.SelectedUser" asp-route-contestName="@Model.SelectedContest"
+                   onclick="return confirm('Prajete si exportovať zoznam do excelu? (na základne zvoleného filtra)')" />
+        </form>
+    </div>
+</div>
+
+@await Html.PartialAsync("_TableHeaderPartial", Model.PaginationViewModel)
 
 <br />
 
@@ -22,45 +58,90 @@
             <th class="text-center">
                 Správne
             </th>
-            <th>
+            @*<th>
 
-            </th>
+            </th>*@
         </tr>
 
     </thead>
     <tbody class="bg-white">
-        @for (int i = 0; i < Model.Entities.Count; i++)
+        @if (Model.PaginationViewModel.Entities.Count == 0)
+        {
+            <tr>
+                <td class="text-center" colspan="3">Nenašli sa žiadne záznamy.</td>
+            </tr>
+        }
+
+        @for (int i = 0; i < Model.PaginationViewModel.Entities.Count; i++)
         {
             <tr>
                 <td>
-                    @(i + 1)
+                    @(Model.PaginationViewModel.PageLength * (Model.PaginationViewModel.CurrentPage - 1) + 1 + i)
                 </td>
                 <td>
-                    @Html.DisplayFor(a => a.Entities[i].ApplicationUser.Email)
+                    @Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ApplicationUser.Email)
                 </td>
                 <td>
-                    @if (Model.Entities[i].ContestQuestion.Contest.IsActive)
+                    @if (Model.PaginationViewModel.Entities[i].ContestQuestion.Contest.IsActive)
                     {
-                        <span class="text-success">@Html.DisplayFor(a => a.Entities[i].ContestQuestion.Contest.Name)</span>
+                        <span class="text-success">@Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ContestQuestion.Contest.Name)</span>
                     }
                     else
                     {
-                        @Html.DisplayFor(a => a.Entities[i].ContestQuestion.Contest.Name)
+                        @Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ContestQuestion.Contest.Name)
                     }
                 </td>
                 <td>
-                    @Html.DisplayFor(a => a.Entities[i].ContestQuestion.Question.Name)
+                    @Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ContestQuestion.Question.Name)
                 </td>
                 <td class="text-center">
-                    @(Model.Entities[i].IsAnsweredCorrectly ? "Áno" : "Nie")
+                    @(Model.PaginationViewModel.Entities[i].IsAnsweredCorrectly ? "Áno" : "Nie")
                 </td>
-                <td class="text-center">
+                @*<td class="text-center">
                     <input asp-action="FilterEntities" asp-route-answerToDelete="@i" type="submit" value="X" class="btn btn-dark" formmethod="post"
                            onclick="return confirm('Naozaj chcete odstrániť odpoveď ?')" />
-                </td>
+                </td>*@
             </tr>
         }
     </tbody>
 </table>
 
-@await Html.PartialAsync("_TableFooterPartial", Model)
+@await Html.PartialAsync("_TableFooterPartial", Model.PaginationViewModel)
+
+
+<script>
+    $('.selectpicker').selectpicker('refresh');
+
+    $("#filterAnswers").on("click", function () {
+        updateTable();
+    });    
+
+    updateTable = function (pageNumber = 1) {
+
+        var searchString = $("#searchInput").val();
+        var pageLength = $("#pageLength").val();
+
+        var userEmail = $("#selectedUser").val();
+        var contestName = $("#selectedContest").val();
+
+        console.log("override ajax call");
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetPartialViewData")',
+            data: {
+                'userEmail': userEmail,
+                'contestName': contestName,
+                'searchString': searchString,
+                'pageLength': pageLength,
+                'pageNumber': pageNumber
+            },
+            success: function (result) {
+                $("#partial").html(result);
+            },
+            error: function () {
+                alert('Error occurred');
+            }
+        });
+    }
+</script>

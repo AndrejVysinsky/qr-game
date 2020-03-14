@@ -11,7 +11,7 @@ namespace QuizWebApp.ViewModels
         public PaginationViewModel<ContestQuestionUser> PaginationViewModel { get; set; } = new PaginationViewModel<ContestQuestionUser>();
         public List<string> Users { get; set; }
         public List<string> Contests { get; set; }
-        public int SelectedUser { get; set; } = 0;
-        public int SelectedContest { get; set; } = 0;
+        public string SelectedUser { get; set; } = string.Empty;
+        public string SelectedContest { get; set; } = string.Empty;
     }
 }

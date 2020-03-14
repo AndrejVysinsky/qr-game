@@ -62,17 +62,20 @@
         $("#searchInput").change();
     });
 
-    function updateTable(pageNumber = 1) {
+    var updateTable = function(pageNumber = 1) {
         var searchString = $("#searchInput").val();
         var pageLength = $("#pageLength").val();
+
+        console.log("ajax call");
+
         $.ajax({
             type: "GET",
             url: '@Url.Action("GetPartialViewData")',
-            data: { 'searchString': searchString, 'pageLength': pageLength, 'pageNumber': pageNumber },
+            data: { 'searchString': searchString, 'pageLength': pageLength, 'pageNumber': pageNumber },            
             success: function (result) {
                 $("#partial").html(result);
             },
-            error: function (data) {
+            error: function () {
                 alert('Error occurred');
             }
         });
