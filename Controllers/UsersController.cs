@@ -361,7 +361,22 @@ namespace QuizWebApp.Controllers
         [HttpPost]
         public ActionResult RemoveExpiredUsers()
         {
-            var expiredUsers = _context.ApplicationUsers.Where(user => user.IsTemporary == true && (DateTime.Now - user.RegistrationDate).Value.Days >= 14);
+            /*
+               toto query nevie spracovat
+                
+                _context.ApplicationUsers.Where(user => user.IsTemporary == true && (DateTime.Now - user.RegistrationDate).Value.Days >= 14).ToList()
+             */
+            var temporaryUsers = _context.ApplicationUsers.Where(user => user.IsTemporary == true).ToList();
+
+            var expiredUsers = new List<ApplicationUser>();
+            foreach(var user in temporaryUsers)
+            {
+                if ((DateTime.Now - user.RegistrationDate).Value.Days >= 14)
+                {
+                    expiredUsers.Add(user);
+                }
+            }
+
             _context.RemoveRange(expiredUsers);
             _context.SaveChanges();
             return RedirectToAction("UserList");

@@ -7,20 +7,20 @@
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
-            <th>
+            <th style="width: 10%">
                 #
             </th>
-            <th>
+            <th style="width: 25%">
                 Názov súťaže
             </th>
-            <th class="text-center">
+            <th class="text-center" style="width: 25%">
                 Akcie
             </th>
-            <th class="text-center">
+            <th class="text-center" style="width: 20%">
                 Stav
             </th>
-            <th class="text-center">
-                QR
+            <th class="text-center" style="width: 20%">
+                QR kódy
             </th>
         </tr>
 
@@ -29,32 +29,36 @@
         @if (Model.Entities.Count == 0)
         {
             <tr>
-                <td class="text-center" colspan="3">Nenašli sa žiadne záznamy.</td>
+                <td class="text-center" colspan="5">Nenašli sa žiadne záznamy.</td>
             </tr>
         }
 
         @for (int i = 0; i < Model.Entities.Count; i++)
         {
             <tr>
-                <td>@(Model.PageLength * (Model.CurrentPage - 1) + 1 + i)</td>
-                <td>@Html.DisplayFor(modelItem => Model.Entities[i].Name)</td>
-                <td class="text-center">
+                <td style="width: 10%">@(Model.PageLength * (Model.CurrentPage - 1) + 1 + i)</td>
+
+                <td style="width: 25%">@Html.DisplayFor(modelItem => Model.Entities[i].Name)</td>
+
+                <td class="text-center" style="width: 25%">
                     <a asp-action="Edit" asp-route-id="@Model.Entities[i].Id">Upraviť</a> |
                     <a asp-action="Details" asp-route-id="@Model.Entities[i].Id">Zobraziť</a> |
                     <a asp-action="Delete" asp-route-id="@Model.Entities[i].Id">Vymazať</a>
                 </td>
-                <td class="text-center">
+
+                <td class="text-center" style="width: 20%">
                     @if (Model.Entities[i].IsActive)
                     {
-                        <a asp-action="Activate" asp-route-id="@Model.Entities[i].Id" class="text-success font-weight-bold">Súťaž je aktívna</a>
+                        <a asp-action="Activate" asp-route-id="@Model.Entities[i].Id" class="text-success font-weight-bold">Aktívna</a>
                     }
                     else
                     {
-                        <a asp-action="Activate" asp-route-id="@Model.Entities[i].Id" class="text-danger">Súťaž je neaktívna</a>
+                        <a asp-action="Activate" asp-route-id="@Model.Entities[i].Id" class="text-danger">Neaktívna</a>
                     }
                 </td>
-                <td class="text-center">
-                    <a asp-action="GenerateQRCodes" asp-route-id="@Model.Entities[i].Id" target="_blank">Vygenerovať QR kódy</a>
+
+                <td class="text-center" style="width: 20%">
+                    <a asp-action="GenerateQRCodes" asp-route-id="@Model.Entities[i].Id" target="_blank">Vygenerovať</a>
                 </td>
             </tr>
         }

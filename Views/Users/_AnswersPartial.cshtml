@@ -43,19 +43,19 @@
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
-            <th>
+            <th style="width: 10%">
                 #
             </th>
-            <th>
+            <th style="width: 30%">
                 Email
             </th>
-            <th>
+            <th style="width: 20%">
                 Súťaž
             </th>
-            <th>
+            <th style="width: 30%">
                 Otázka
             </th>
-            <th class="text-center">
+            <th class="text-center" style="width: 10%">
                 Správne
             </th>
             @*<th>
@@ -68,20 +68,20 @@
         @if (Model.PaginationViewModel.Entities.Count == 0)
         {
             <tr>
-                <td class="text-center" colspan="3">Nenašli sa žiadne záznamy.</td>
+                <td class="text-center" colspan="5">Nenašli sa žiadne záznamy.</td>
             </tr>
         }
 
         @for (int i = 0; i < Model.PaginationViewModel.Entities.Count; i++)
         {
             <tr>
-                <td>
+                <td style="width: 10%">
                     @(Model.PaginationViewModel.PageLength * (Model.PaginationViewModel.CurrentPage - 1) + 1 + i)
                 </td>
-                <td>
+                <td style="width: 30%">
                     @Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ApplicationUser.Email)
                 </td>
-                <td>
+                <td style="width: 20%">
                     @if (Model.PaginationViewModel.Entities[i].ContestQuestion.Contest.IsActive)
                     {
                         <span class="text-success">@Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ContestQuestion.Contest.Name)</span>
@@ -91,10 +91,10 @@
                         @Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ContestQuestion.Contest.Name)
                     }
                 </td>
-                <td>
+                <td style="width: 30%">
                     @Html.DisplayFor(a => a.PaginationViewModel.Entities[i].ContestQuestion.Question.Name)
                 </td>
-                <td class="text-center">
+                <td class="text-center" style="width: 10%">
                     @(Model.PaginationViewModel.Entities[i].IsAnsweredCorrectly ? "Áno" : "Nie")
                 </td>
                 @*<td class="text-center">
