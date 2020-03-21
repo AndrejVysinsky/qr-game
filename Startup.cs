@@ -33,10 +33,6 @@ namespace QuizWebApp
         {
             Configuration = configuration;
             _hostEnvironment = hostEnvironment;
-
-            myTimer = new Timer(24 * 60 * 60 * 1000); //one day in milliseconds
-            myTimer.Elapsed += new ElapsedEventHandler(CleanUp);
-            myTimer.Start();
         }
 
         public IConfiguration Configuration { get; }
@@ -93,6 +89,7 @@ namespace QuizWebApp
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
+            services.AddHostedService<CleanUpService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -153,18 +150,6 @@ namespace QuizWebApp
             if (!userRoleExists)
                 await RoleManager.CreateAsync(new IdentityRole("User")); 
          
-        }
-
-        private void CleanUp(object src, ElapsedEventArgs e)
-        {
-            var tempsPath = Path.Combine(_hostEnvironment.WebRootPath, @"uploads/temps/");
-
-            DirectoryInfo di = new DirectoryInfo(tempsPath);
-
-            foreach (FileInfo file in di.GetFiles())
-            {
-                file.Delete();
-            }
         }
     }
 }
