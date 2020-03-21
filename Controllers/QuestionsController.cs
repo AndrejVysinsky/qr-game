@@ -221,7 +221,7 @@ namespace QuizWebApp.Controllers
         {
             var questionDb = _context.Questions.Include(q => q.Answers).Single(q => q.Id == question.Id);
             
-            var contestQuestionDb = _context.ContestQuestions.Include(cq => cq.Contest).Where(cq => cq.QuestionId == question.Id).ToList();
+            var contestQuestionDb = _context.ContestQuestions.Include(cq => cq.Contest).Where(cq => cq.QuestionId == question.Id).Select(cq => cq.Contest.Name).ToList();
 
             if (contestQuestionDb.Count != 0)
             {
@@ -230,7 +230,7 @@ namespace QuizWebApp.Controllers
                 {
                     QuestionName = questionDb.Name,
                     QuestionText = questionDb.Text,
-                    ContestQuestions = contestQuestionDb
+                    ContestNames = contestQuestionDb
                 };
                 return View("ErrorOnDelete", errorViewModel);
             }
@@ -380,28 +380,20 @@ namespace QuizWebApp.Controllers
             var path = Path.Combine(_hostEnvironment.WebRootPath, @"uploads/images", imgName);
 
             if (isTemp)
-            {
                 path = Path.Combine(_hostEnvironment.WebRootPath, @"uploads/temps", imgName);
-            }
-
-            //var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\uploads\\temps", imgName);
 
             if (System.IO.File.Exists(path))
-            {
                 System.IO.File.Delete(path);
-            }
         }
 
         private void ClearTemps()
         {
             var tempsPath = Path.Combine(_hostEnvironment.WebRootPath, @"uploads/temps");
 
-            System.IO.DirectoryInfo di = new DirectoryInfo(tempsPath);
+            DirectoryInfo di = new DirectoryInfo(tempsPath);
 
             foreach (FileInfo file in di.GetFiles())
-            {
                 file.Delete();
-            }
         }
     }
 }

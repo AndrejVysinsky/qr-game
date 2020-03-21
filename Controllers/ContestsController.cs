@@ -144,7 +144,11 @@ namespace QuizWebApp.Controllers
 
         public ActionResult Edit(int id)
         {
-            var contest = _context.Contests.Include(cq => cq.ContestQuestions).SingleOrDefault(c => c.Id == id);
+            var contest = _context.Contests.Include(cq => cq.ContestQuestions).ThenInclude(cq => cq.Question).SingleOrDefault(c => c.Id == id);
+
+            if (contest == null)
+                return NotFound();
+
             var selectedQuestions = new List<KeyValuePair<Question, bool>>();
 
             bool warning = false;
@@ -152,39 +156,21 @@ namespace QuizWebApp.Controllers
             {
                 Question q = _context.Questions.SingleOrDefault(q => q.Id == item.QuestionId);
 
-                var list = _context.ContestQuestionUsers
+                var answerExists = _context.ContestQuestionUsers
                                     .Include(cqu => cqu.ContestQuestion)
                                     .Where(cqu => cqu.ContestQuestion.ContestId == id)
                                     .Where(cqu => cqu.ContestQuestion.QuestionId == q.Id)
-                                    .ToList();
-
-                if (list.Count == 0)
-                {
-                    selectedQuestions.Add(new KeyValuePair<Question, bool>(q, false));
-                } 
-                else
-                {
-                    selectedQuestions.Add(new KeyValuePair<Question, bool>(q, true));
+                                    .Any();
+                
+                if (answerExists)
                     warning = true;
-                }
+
+                //hodnota true znamená, že otázka už má záznam o odpovedi -> teda nebude možné ju vymazať
+                selectedQuestions.Add(new KeyValuePair<Question, bool>(q, answerExists));
             }
-
-            if (contest == null)
-                return NotFound();
-
-            var questions = _context.Questions.ToList();
-
-            for (int i = questions.Count - 1; i >= 0; i--)
-            {
-                for (int j = 0; j < selectedQuestions.Count; j++)
-                {
-                    if (questions[i].Id == selectedQuestions[j].Key.Id)
-                    {
-                        questions.RemoveAt(i);
-                        break;
-                    }
-                }
-            }
+            
+            //otazky ktore nie su este v sutazi -> vsetky - zvolene
+            var notSelectedQuestions = _context.Questions.Where(q => !contest.ContestQuestions.Select(cq => cq.QuestionId).Any(cqID => q.Id == cqID)).ToList();
 
             var viewModel = new ContestViewModel()
             {
@@ -193,7 +179,7 @@ namespace QuizWebApp.Controllers
                 Warning = warning,
                 SelectedQuestions = selectedQuestions,
                 SelectedQuestionId = 0,
-                Questions = questions
+                Questions = notSelectedQuestions
             };
 
             return View("ContestForm", viewModel);
@@ -215,10 +201,10 @@ namespace QuizWebApp.Controllers
         {
             var contestDb = _context.Contests.Include(c => c.ContestQuestions).SingleOrDefault(q => q.Id == contest.Id);
 
-            var contestQuestionUserDb = _context.ContestQuestionUsers.Include(cqu => cqu.ContestQuestion).
-                Where(cqu => cqu.ContestQuestion.ContestId == contestDb.Id).ToList();
+            var contestHasAnswers = _context.ContestQuestionUsers.Include(cqu => cqu.ContestQuestion).
+                Where(cqu => cqu.ContestQuestion.ContestId == contestDb.Id).Any();
 
-            if (contestQuestionUserDb.Count != 0)
+            if (contestHasAnswers)
             {
                 //error handling
                 return View("ErrorOnDelete", contestDb);

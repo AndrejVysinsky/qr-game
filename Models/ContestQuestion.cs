@@ -11,6 +11,8 @@ namespace QuizWebApp.Models
 
         public int QuestionNumber { get; set; }
 
+        public int ViewCount { get; set; }
+
         public int ContestId { get; set; }
         public virtual Contest Contest { get; set; }
 

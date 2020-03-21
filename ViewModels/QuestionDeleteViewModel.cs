@@ -10,6 +10,8 @@ namespace QuizWebApp.ViewModels
     {
         public string QuestionName { get; set; }
         public string QuestionText { get; set; }
-        public List<ContestQuestion> ContestQuestions { get; set; }
+
+        //sutaze, ktore obsahuju danu otazku
+        public List<string> ContestNames { get; set; }
     }
 }

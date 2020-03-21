@@ -111,8 +111,6 @@ namespace QuizWebApp.Controllers
             if (!string.IsNullOrEmpty(contestName))
                 query = query.Where(q => q.ContestQuestion.Contest.Name.Contains(contestName));
 
-            //var answersPaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
-
             var answersViewModel = new AnswersViewModel();
             answersViewModel.PaginationViewModel = GetViewModelData(searchString, pageLength, pageNumber, query);
 
@@ -299,13 +297,21 @@ namespace QuizWebApp.Controllers
 
             //ak uz uzivatel na otazku odpovedal
             var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var contestQuestionUser = _context.ContestQuestionUsers
+            var isAnswered = _context.ContestQuestionUsers
                                                 .Where(cqu => cqu.UserId == UserId)
                                                 .Where(cqu => cqu.ContestQuestionId == id)
-                                                .SingleOrDefault();
+                                                .Any();
 
-            if (contestQuestionUser != null)
+            if (isAnswered)
                 return RedirectToAction("ErrorPage", "Home", new { chybovaHlaska = "Na túto otázku ste už raz odpovedali. Skúste nájsť a naskenovať ďalšiu." });
+
+            var isRegularUser = _userManager.GetUsersInRoleAsync("User").Result.Any(user => user.Id == UserId);
+
+            if (isRegularUser)
+            {
+                contestQuestion.ViewCount++;
+                _context.SaveChanges();
+            }
 
             return View(contestQuestion);
         }
