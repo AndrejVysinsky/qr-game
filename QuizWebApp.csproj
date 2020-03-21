@@ -18,6 +18,8 @@
     <Compile Remove="Data\Migrations\20200308112023_AddedRegistrationDateForUser.Designer.cs" />
     <Compile Remove="Data\Migrations\20200308154150_RoleReference.cs" />
     <Compile Remove="Data\Migrations\20200308154150_RoleReference.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200321151434_AddAnswerCount.cs" />
+    <Compile Remove="Data\Migrations\20200321151434_AddAnswerCount.Designer.cs" />
   </ItemGroup>
 
 

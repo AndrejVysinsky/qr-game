@@ -338,6 +338,16 @@ namespace QuizWebApp.Controllers
                 IsAnsweredCorrectly = questionDb.Answers[radioIndex].IsCorrect
             });
 
+            var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isRegularUser = _userManager.GetUsersInRoleAsync("User").Result.Any(user => user.Id == UserId);
+
+            /*
+             * admin a moderator mozu otazku zobrazit lubovolny pocet krat bez zvysenia poctu zobrazeni (dolezite len pre pouzivatelov)
+             * avsak pri ich odpovedi je potrebne zapocitat aj zobrazenie (aby sa nestalo ze odpovedi je viac ako zobrazeni)
+             */
+            if (!isRegularUser)
+                contestQuestionDb.ViewCount++;
+
             _context.SaveChanges();
 
             return RedirectToAction("MyContests");

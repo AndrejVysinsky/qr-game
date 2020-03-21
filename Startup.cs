@@ -135,8 +135,8 @@ namespace QuizWebApp
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            bool adminExists = await RoleManager.RoleExistsAsync("Admin");
-            if (!adminExists)
+            bool adminRoleExists = await RoleManager.RoleExistsAsync("Admin");
+            if (!adminRoleExists)
             {
                 await RoleManager.CreateAsync(new IdentityRole("Admin"));
 
@@ -145,12 +145,12 @@ namespace QuizWebApp
                 await UserManager.AddToRoleAsync(user, "Admin");
             }
 
-            bool modExists = await RoleManager.RoleExistsAsync("Moderator");
-            if (!modExists)
+            bool modRoleExists = await RoleManager.RoleExistsAsync("Moderator");
+            if (!modRoleExists)
                 await RoleManager.CreateAsync(new IdentityRole("Moderator"));
 
-            bool userExists = await RoleManager.RoleExistsAsync("User");
-            if (!userExists)
+            bool userRoleExists = await RoleManager.RoleExistsAsync("User");
+            if (!userRoleExists)
                 await RoleManager.CreateAsync(new IdentityRole("User")); 
          
         }

@@ -132,8 +132,8 @@ namespace QuizWebApp.Controllers
         public ActionResult Details(int id)
         {
             var contest = _context.Contests.SingleOrDefault(c => c.Id == id);
-            var cq = _context.ContestQuestions.Include(cq => cq.Question).Where(cq => cq.ContestId == id).OrderBy(cq => cq.QuestionNumber).ToList();
-
+            var cq = _context.ContestQuestions.Include(cq => cq.Question).Include(cq => cq.ContestQuestionUsers).Where(cq => cq.ContestId == id).OrderBy(cq => cq.QuestionNumber).ToList();
+            
             contest.ContestQuestions = cq;
 
             if (contest == null)
