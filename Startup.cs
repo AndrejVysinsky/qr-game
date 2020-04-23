@@ -30,8 +30,8 @@ namespace QuizWebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Environment.GetEnvironmentVariable("DATABASE_CONN_STR") 
+                                        ?? Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<ApplicationUser>(options =>
             {
@@ -72,16 +72,12 @@ namespace QuizWebApp
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
-            // requires
-            // using Microsoft.AspNetCore.Identity.UI.Services;
-            // using WebPWrecover.Services;
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
-            services.AddHostedService<CleanUpService>();
+            services.AddHostedService<CleanUpService>();            
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
             if (env.IsDevelopment())
@@ -92,7 +88,6 @@ namespace QuizWebApp
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseForwardedHeaders(new ForwardedHeadersOptions { KnownNetworks = { new IPNetwork(IPAddress.Parse("172.21.0.0"), 16) }, ForwardedHeaders = ForwardedHeaders.All });
@@ -113,6 +108,7 @@ namespace QuizWebApp
                 endpoints.MapRazorPages();
             });
 
+            UpdateDatabase(app);
             CreateUserRoles(services).Wait();
         }
 
@@ -138,7 +134,18 @@ namespace QuizWebApp
             bool userRoleExists = await RoleManager.RoleExistsAsync("User");
             if (!userRoleExists)
                 await RoleManager.CreateAsync(new IdentityRole("User")); 
-         
+        }
+
+        private static void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                                                            .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }

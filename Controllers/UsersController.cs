@@ -414,17 +414,17 @@ namespace QuizWebApp.Controllers
         {
             var user = _context.ApplicationUsers.SingleOrDefault(u => u.Id == id);
 
-            bool isModerator = await _userManager.IsInRoleAsync(user, "Moderator");
+            //bool isModerator = await _userManager.IsInRoleAsync(user, "Moderator");
             bool isUser = await _userManager.IsInRoleAsync(user, "User");
 
             string newRole = string.Empty;
             string oldRole = string.Empty;
 
-            if (isModerator)
+            /*if (isModerator)
             {
                 oldRole = "Moderator";
                 newRole = "Admin";
-            }
+            }*/
 
             if (isUser)
             {
@@ -447,17 +447,17 @@ namespace QuizWebApp.Controllers
         {
             var user = _context.ApplicationUsers.SingleOrDefault(u => u.Id == id);
 
-            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            //bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
             bool isModerator = await _userManager.IsInRoleAsync(user, "Moderator");
 
             string oldRole = string.Empty;
             string newRole = string.Empty;
 
-            if (isAdmin)
+            /*if (isAdmin)
             {
                 oldRole = "Admin";
                 newRole = "Moderator";
-            }
+            }*/
 
             if (isModerator)
             {
@@ -470,6 +470,16 @@ namespace QuizWebApp.Controllers
                 await _userManager.RemoveFromRoleAsync(user, oldRole);
                 await _userManager.AddToRoleAsync(user, newRole);
             }
+
+            return RedirectToAction("UserList");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = _context.ApplicationUsers.SingleOrDefault(u => u.Id == id);
+            await _userManager.DeleteAsync(user);
 
             return RedirectToAction("UserList");
         }

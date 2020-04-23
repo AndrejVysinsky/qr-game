@@ -90,7 +90,10 @@ namespace QuizWebApp.Areas.Identity.Pages.Account.Manage
             bool emailExists = _context.ApplicationUsers.Any(user => user.Email == Input.NewEmail);
 
             if (emailExists)
-                ModelState.AddModelError(string.Empty, "Zadaný email už existuje");
+                ModelState.AddModelError(string.Empty, "Zadaný email už existuje.");
+
+            if (Input.NewEmail.Contains("@frivia.sk"))
+                ModelState.AddModelError(string.Empty, "Táto doména je rezervovaná pre dočasné účty.");
 
             if (!ModelState.IsValid)
             {

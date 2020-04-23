@@ -28,34 +28,51 @@
         <table class="table table-striped table-responsive-sm">
             <thead class="thead-dark">
                 <tr>
-                    <th style="width: 10%">#</th>
+                    <th style="width: 5%">#</th>
                     <th style="width: 50%">Email</th>
-                    <th style="width: 30%">Zmeniť práva</th>
+                    <th style="width: 10%; text-align: center">Zmeniť práva</th>
+                    <th style="width: 20%; text-align: center">Expiruje</th>
+                    <th style="width: 5%; text-align: center"></th>
                 </tr>
             </thead>
             <tbody class="bg-white">
                 @for (int j = offset; j < Model.RolesCount[i] + offset; j++)
                 {
                     <tr>
-                        <td style="width: 10%">
-                            @(j + 1)
+                        <td style="width: 5%">
+                            @(j - offset + 1)
                         </td>
                         <td style="width: 50%">
                             @Html.DisplayFor(a => a.UserList[j].Email)
                         </td>
-                        <td style="width: 30%">
-                            @if (Model.RoleNames[i] != "Administrátori")
+                        <td style="width: 10%; text-align: center">
+                            @if (Model.RoleNames[i] == "Používatelia" && !Model.UserList[j].IsTemporary)
                             {
                                 <button asp-action="PromoteUser" asp-route-id="@Model.UserList[j].Id" type="submit" formmethod="post" class="btn"
-                                        onclick="return confirm('Naozaj chcete zvýšiť práva používateľa @Model.UserList[j].Email ?')">
+                                        onclick="return confirm('Naozaj chcete zvýšiť práva používateľa @Model.UserList[j].Email?')">
                                     <i class="fas fa-arrow-up"></i>
                                 </button>
                             }
-                            @if (Model.RoleNames[i] != "Používatelia" && User.Identity.Name != Model.UserList[j].Email)
+                            @if (Model.RoleNames[i] == "Moderátori")
                             {
                                 <button asp-action="DemoteUser" asp-route-id="@Model.UserList[j].Id" type="submit" formmethod="post" class="btn"
-                                        onclick="return confirm('Naozaj chcete znížiť práva používateľa @Model.UserList[j].Email ?')">
+                                        onclick="return confirm('Naozaj chcete znížiť práva používateľa @Model.UserList[j].Email?')">
                                     <i class="fas fa-arrow-down"></i>
+                                </button>
+                            }                            
+                        </td>
+                        <td style="width: 20%; text-align: center">
+                            @if (Model.UserList[j].IsTemporary)
+                            {
+                                @Model.UserList[j].RegistrationDate.Value.AddDays(14).ToShortDateString()
+                            }
+                        </td>
+                        <td style="width: 5%; text-align: center">
+                            @if (Model.RoleNames[i] != "Administrátori")
+                            {
+                            <button asp-action="DeleteUser" asp-route-id="@Model.UserList[j].Id" type="submit" formmethod="post" class="btn"
+                                        onclick="return confirm('Naozaj chcete vymazať používateľa @Model.UserList[j].Email?')">
+                                    <i class="fas fa-times text-danger"></i>
                                 </button>
                             }
                         </td>
@@ -67,26 +84,4 @@
         offset += Model.RolesCount[i];
     }
 </form>
-
-<script>
-    $(document).ready(function () {
-        $('#dataTable').DataTable({
-            "language": {
-                "lengthMenu": "Zobraz _MENU_ záznamov na stranu",
-                "zeroRecords": "Nenašli sa žiadne záznamy",
-                "info": "Strana _PAGE_ z _PAGES_",
-                "infoEmpty": "Žiadne dostupné záznamy",
-                "infoFiltered": "",
-                "search": "Hľadať",
-                "paginate": {
-                    "first": "Prvá",
-                    "last": "Posledná",
-                    "next": "Nasledujúca",
-                    "previous": "Predchádzajúca"
-                }
-            },
-            "ordering": false
-        });
-    });
-</script>
 

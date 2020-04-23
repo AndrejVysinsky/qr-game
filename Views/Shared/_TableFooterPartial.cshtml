@@ -37,6 +37,9 @@
     $(".pageButton").each(function () {
         $(this).on("click", function () {
 
+            if ($(this).text() == $("#currentPage").text())
+                return;
+
             if (this.id == "firstPageButton") {
                 updateTable("1");
             }
@@ -62,7 +65,7 @@
         $("#searchInput").change();
     });
 
-    var updateTable = function(pageNumber = 1) {
+    var updateTable = function (pageNumber = 1) {
         var searchString = $("#searchInput").val();
         var pageLength = $("#pageLength").val();
 
