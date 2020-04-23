@@ -9,7 +9,15 @@ namespace QuizWebApp.ViewModels
     public class MyContestsViewModel
     {
         public List<Contest> Contests { get; set; }
+        public List<List<AnswerEnum>> IndividualAnswers { get; set; }
         public List<int> AnswersCount { get; set; }
-        public List<int> CorrectAnswersCount { get; set; }
+        public List<int> CorrectAnswersCount { get; set; }        
+    }
+
+    public enum AnswerEnum
+    {
+        NotAnswered,
+        Correct,
+        Incorrect        
     }
 }

@@ -267,7 +267,7 @@ body {
 
 
 .progress {
-    border-radius: 20px !important;
+    border-radius: 5px !important;
     height: 20px;
 }
 
@@ -307,4 +307,11 @@ body {
     margin-bottom: 10px;
     -webkit-overflow-scrolling: touch;
     cursor: pointer;
+}
+
+.answerCard {
+    margin: 5px;
+    height: 60px;
+    width: 60px;
+    text-align: center;
 }

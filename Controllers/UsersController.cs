@@ -35,31 +35,47 @@ namespace QuizWebApp.Controllers
         {
             var answersCount = new List<int>();
             var correctAnswersCount = new List<int>();
-
             var contests = _context.Contests.Include(c => c.ContestQuestions).ToList();
+            var individualAnswers = new List<List<AnswerEnum>>();
+
+            
+
             foreach (var contest in contests)
             {
                 var id = contest.Id;
-                var contestQuestionUser = _context.ContestQuestionUsers
+                var answeredQuestions = _context.ContestQuestionUsers
                                                         .Include(cqu => cqu.ContestQuestion)
                                                         .Where(cqu => cqu.ContestQuestion.ContestId == contest.Id)
                                                         .Where(cqu => cqu.UserId == _signedUserID)
+                                                        .OrderBy(cqu => cqu.ContestQuestion.QuestionNumber)
                                                         .ToList();
 
-                answersCount.Add(contestQuestionUser.Count);
+                int correctCount = 0;
+                individualAnswers.Add(new List<AnswerEnum>());
 
-                int count = 0;
-                foreach (var answer in contestQuestionUser)
+                for (int i = 0; i < contest.ContestQuestions.Count; i++)
+                    individualAnswers.Last().Add(AnswerEnum.NotAnswered);
+
+                foreach (var answer in answeredQuestions)
                 {
                     if (answer.IsAnsweredCorrectly)
-                        count++;
+                    {
+                        correctCount++;
+                        individualAnswers.Last()[answer.ContestQuestion.QuestionNumber - 1] = AnswerEnum.Correct;
+                    }
+                    else
+                    {
+                        individualAnswers.Last()[answer.ContestQuestion.QuestionNumber - 1] = AnswerEnum.Incorrect;
+                    }
                 }
-                correctAnswersCount.Add(count);
+                answersCount.Add(answeredQuestions.Count);
+                correctAnswersCount.Add(correctCount);
             }
 
             var myContestsViewModel = new MyContestsViewModel()
             {
                 Contests = contests,
+                IndividualAnswers = individualAnswers,
                 AnswersCount = answersCount,
                 CorrectAnswersCount = correctAnswersCount
             };
