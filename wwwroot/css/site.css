@@ -179,6 +179,13 @@ body {
     border-right: 2px solid lightgrey;
 }
 
+@media (max-width: 768px) {
+    .form-bg {
+        padding-right: 10px !important;
+        padding-left: 10px !important;
+    }
+}
+
 .divLogo {
     margin-right: 50px;
 }
@@ -286,4 +293,18 @@ body {
 
 #pageLength {
     border-color: #292b2c;
+}
+
+#questionList {
+    max-height: 300px;
+    margin-bottom: 10px;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    cursor: pointer;
+}
+
+.list-group {
+    margin-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+    cursor: pointer;
 }

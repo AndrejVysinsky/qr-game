@@ -134,18 +134,18 @@ namespace QuizWebApp.Controllers
             
             if (!string.IsNullOrEmpty(userEmail))
             {
-                //zvolený user
+                //zvolený filter používateľa
                 userList.Add(_context.ApplicationUsers.SingleOrDefault(u => u.Email == userEmail));
             } 
             else
             {
-                //všetci
+                //všetci - žiadny filter
                 userList = _context.ApplicationUsers.ToList();
             }
 
             if (!string.IsNullOrEmpty(contestName))
             {
-                //jedna súťaž
+                //zvolený filter súťaže
                 contestList.Add(_context.Contests.SingleOrDefault(c => c.Name == contestName));
 
                 var cq = _context.ContestQuestions.Include(cq => cq.Question)
@@ -158,7 +158,7 @@ namespace QuizWebApp.Controllers
             }
             else
             {
-                //všetky
+                //všetky - žiadny filter
                 contestList = _context.Contests.ToList();
 
                 foreach (var c in contestList)

@@ -18,7 +18,7 @@ namespace QuizWebApp.ViewModels
         public bool Warning { get; set; }
         public List<KeyValuePair<Question, bool>> SelectedQuestions { get; set; }
 
-        public int SelectedQuestionId { get; set; }
+        public string SelectedQuestion { get; set; }
         
         [Display(Name = "Otázky")]
         public List<Question> Questions { get; set; }

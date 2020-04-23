@@ -72,16 +72,17 @@
                         <div class="col-1 my-auto">
                             <input type="radio" name="IsCorrect" value="@i" class="big-radio" checked="checked" />
                         </div>
-                        <div class="col-7 my-auto">
+                        <div class="col-11 col-md-9 my-auto">
                             @Html.TextAreaFor(a => a.Answers[i].Text, new { @class = "answerTextArea" })
                             <span id="answerTextValidation@(i)" class="text-danger"></span>
                         </div>
                         @if (Model.Answers[i].Image != null)
                         {
-                            <div class="col-1 my-auto">
+                            <div class="col-1 d-md-none"></div>
+                            <div class="col-2 col-md-1 my-auto">
                                 <img src="~/uploads/temps/@Model.Answers[i].Image" width="50" class="img-thumbnail img-fluid" id="answerImage@(i)" alt="Obrázok odpovede">
                             </div>
-                            <div class="col-1 my-auto">
+                            <div class="col-1 col-md-1 my-auto">
                                 <input asp-action="RemoveImage" asp-route-img="@Model.Answers[i].Image" asp-route-editing="false" type="submit" value="X" class="btn btn-dark" formmethod="post"
                                        onclick="return confirm('Naozaj chcete odstrániť obrázok ?')" />
                             </div>

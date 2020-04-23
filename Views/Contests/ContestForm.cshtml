@@ -21,69 +21,19 @@
             <h5>@Html.LabelFor(a => a.Questions, new { @class = "font-weight-bold" })</h5>
         </div>
 
-        @if (Model.SelectedQuestions.Count == 0)
-        {
-            @Html.HiddenFor(a => a.SelectedQuestions)
-        }
-
-        @for (var i = 0; i < Model.SelectedQuestions.Count; i++)
-        {
-            <div class="form-group border border-light bg-light myDiv">
-                <div class="form-row">
-                    <div class="col-1 my-auto font-weight-bold" align="center">
-                        @("#" + (i + 1))
-                    </div>
-                    <div class="col my-auto">
-                        @Html.DisplayFor(a => a.SelectedQuestions[i].Key.Name, new { @class = "form-control" })
-                        @Html.HiddenFor(a => a.SelectedQuestions[i].Key.Name)
-                    </div>
-                    <div class="col-1 my-auto">
-                        @if (Model.SelectedQuestions[i].Value)
-                        {
-                            <span class="text-danger font-weight-bold">*</span>
-                        }
-                        else if (Model.Warning)
-                        {
-                        }
-                        else
-                        {
-                            <input asp-action="RemoveQuestion" asp-route-id="@i" type="submit" value="X" class="btn btn-dark" formmethod="post"
-                                    onclick="return confirm('Naozaj chcete odstrániť otázku ?')" />
-                        }
-                    </div>
-                </div>
+        <h5>Vybraté otázky</h5>
+        <div class="panel panel-primary">
+            <div class="panel-body">
+                <ul class="list-group">
+                    @for (var i = 0; i < Model.SelectedQuestions.Count; i++)
+                    {
+                        <li class="list-group-item">
+                            @Html.DisplayFor(a => a.SelectedQuestions[i].Key.Name)
+                        </li>
+                    }
+                </ul>
             </div>
-
-            @Html.HiddenFor(a => a.SelectedQuestions[i].Key.Id)
-            @Html.HiddenFor(a => a.SelectedQuestions[i].Value)
-        }
-
-        <div class="form-group">
-            @Html.DropDownListFor(a => a.SelectedQuestionId, new SelectList(Model.Questions, "Id", "Name", 1), "Zvoľte otázku",
-                new
-                {
-                    @class = "form-control selectpicker",
-                    data_live_search = "true",
-                    data_live_search_style = "startsWith",
-                    data_live_search_normalize = "true"
-                })
         </div>
-
-        @if (Model.Questions.Count == 0)
-        {
-            @Html.HiddenFor(a => a.Questions)
-        }
-
-        @for (int i = 0; i < Model.Questions.Count; i++)
-        {
-            @Html.HiddenFor(a => a.Questions[i].Id)
-            @Html.HiddenFor(a => a.Questions[i].Text)
-            @Html.HiddenFor(a => a.Questions[i].Name)
-        }
-
-        @Html.HiddenFor(a => a.Warning)
-
-        <input type="hidden" value="0" name="myHiddenId" id="myHiddenId" />
 
         @if (Model.Warning)
         {
@@ -91,29 +41,92 @@
             <p class="text-danger">
                 Ak naozaj chcete upraviť súťaž, musíte najprv
                 <input asp-action="DeleteUserAnswers" type="submit" class="btn btn-danger" value="vymazať údaje" formmethod="post"
-                        onclick="return confirm('Naozaj chcete vymazať odpovede používateľov pre túto súťaž ?')" />
+                       onclick="return confirm('Naozaj chcete vymazať odpovede používateľov pre túto súťaž ?')" />
                 o odpovediach.
             </p>
         }
         else
         {
-            <div class="form-group">
-                <input asp-action="AddQuestion" type="submit" value="Pridať otázku" class="btn btn-add-answer btn-light" formmethod="post" />
+            <div class="form-group d-flex justify-content-center">
+                <button asp-action="AddQuestion" type="submit" class="btn btn-dark" formmethod="post">
+                    <i class="fas fa-angle-up"></i>
+                </button>
+                <span class="col-1"></span>
+                <button asp-action="RemoveQuestion" type="submit" class="btn btn-dark" formmethod="post">
+                    <i class="fas fa-angle-down"></i>
+                </button>
             </div>
 
-            <div class="form-group">
-                <input asp-action="Create" type="submit" value="Uložiť" class="btn btn-primary" formmethod="post" />
+            <h5>Zoznam otázok</h5>
+            <input class="form-control" id="searchField" type="text" placeholder="Vyhľadať otázku..">
+            <br />
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <ul class="list-group list-group-all" id="questionList">
+                        @for (var i = 0; i < Model.Questions.Count; i++)
+                        {
+                            <li class="list-group-item">
+                                @Html.DisplayFor(a => a.Questions[i].Name)
+                            </li>
+                        }
+                    </ul>
+                </div>
             </div>
         }
 
+        @if (Model.SelectedQuestions.Count == 0)
+        {
+            @Html.HiddenFor(a => a.SelectedQuestions)
+        }
 
+        @if (Model.Questions.Count == 0)
+        {
+            @Html.HiddenFor(a => a.Questions)
+        }
+
+        @for (int i = 0; i < Model.SelectedQuestions.Count; i++)
+        {
+            @Html.HiddenFor(a => a.SelectedQuestions[i].Value)
+            @Html.HiddenFor(a => a.SelectedQuestions[i].Key.Id)
+            @Html.HiddenFor(a => a.SelectedQuestions[i].Key.Name)
+        }
+
+        @for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            @Html.HiddenFor(a => a.Questions[i].Id)
+            @Html.HiddenFor(a => a.Questions[i].Name)
+        }
+
+        @Html.HiddenFor(a => a.Warning)
+
+        @Html.HiddenFor(a => a.SelectedQuestion, new { id = "selectedQuestion" })
+
+        <br />
+        <div>
+            <a asp-action="Index">Späť na zoznam</a>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <input asp-action="Create" type="submit" value="Uložiť" class="btn btn-primary" formmethod="post" />
+        </div>
     </form>
-
-    <div>
-        <a asp-action="Index">Späť na zoznam</a>
-    </div>
-
 </div>
+
+<script>
+    $(".list-group-item").on("click", function () {
+        $(".list-group-item").removeClass('active');
+        $(this).addClass('active');
+        $("#selectedQuestion").val($(this).text().trim());
+    });
+
+    $("#searchField").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#questionList li").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+</script>
 
 
 

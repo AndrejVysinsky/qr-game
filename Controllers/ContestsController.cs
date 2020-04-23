@@ -51,7 +51,7 @@ namespace QuizWebApp.Controllers
             var viewModel = new ContestViewModel()
             {
                 SelectedQuestions = new List<KeyValuePair<Question, bool>>(),
-                SelectedQuestionId = 0,
+                SelectedQuestion = string.Empty,
                 Questions = questions
             };
 
@@ -100,32 +100,39 @@ namespace QuizWebApp.Controllers
         [HttpPost]
         public ActionResult AddQuestion(ContestViewModel viewModel)
         {
-            if (viewModel.SelectedQuestionId != 0)
+            if (!string.IsNullOrEmpty(viewModel.SelectedQuestion))
             {
-                for (int i = viewModel.Questions.Count - 1; i >= 0; i--)
-                {
-                    if (viewModel.Questions[i].Id == viewModel.SelectedQuestionId)
-                    {
-                        if (viewModel.SelectedQuestions == null)
-                            viewModel.SelectedQuestions = new List<KeyValuePair<Question, bool>>();
+                Question selected = viewModel.Questions.FirstOrDefault(q => q.Name == viewModel.SelectedQuestion);
 
-                        viewModel.SelectedQuestions.Add(new KeyValuePair<Question, bool>(viewModel.Questions[i], false));
-                        viewModel.Questions.RemoveAt(i);
-                        break;
-                    }
+                if (selected != null)
+                {
+                    if (viewModel.SelectedQuestions == null)
+                        viewModel.SelectedQuestions = new List<KeyValuePair<Question, bool>>();
+
+                    viewModel.SelectedQuestions.Add(new KeyValuePair<Question, bool>(selected, false));
+                    viewModel.Questions.Remove(selected);
                 }
+                viewModel.SelectedQuestion = string.Empty;
                 ModelState.Clear();
             }
             return View("ContestForm", viewModel);
         }
 
         [HttpPost]
-        public ActionResult RemoveQuestion(ContestViewModel viewModel, int id)
+        public ActionResult RemoveQuestion(ContestViewModel viewModel)
         {
-            viewModel.Questions.Add(viewModel.SelectedQuestions[id].Key);
-            viewModel.SelectedQuestions.RemoveAt(id);
-            ModelState.Clear();
+            if (!string.IsNullOrEmpty(viewModel.SelectedQuestion))
+            {
+                KeyValuePair<Question, bool> selected = viewModel.SelectedQuestions.First(q => q.Key.Name == viewModel.SelectedQuestion);
 
+                if (selected.Key != null)
+                {
+                    viewModel.Questions.Add(selected.Key);
+                    viewModel.SelectedQuestions.Remove(selected);
+                }
+                viewModel.SelectedQuestion = string.Empty;
+                ModelState.Clear();
+            }
             return View("ContestForm", viewModel);
         }
 
@@ -178,7 +185,7 @@ namespace QuizWebApp.Controllers
                 ContestName = contest.Name,
                 Warning = warning,
                 SelectedQuestions = selectedQuestions,
-                SelectedQuestionId = 0,
+                SelectedQuestion = string.Empty,
                 Questions = notSelectedQuestions
             };
 

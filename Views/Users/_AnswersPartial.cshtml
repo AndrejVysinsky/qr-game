@@ -3,7 +3,7 @@
 
 <div class="form-group row">
     <div class="col">
-        @Html.DropDownListFor(a => a.SelectedUser, new SelectList(Model.Users, 1), "Zvoľte používateľa",
+        @Html.DropDownListFor(a => a.SelectedUser, new SelectList(Model.Users, 1), "-- používateľ --",
         new
         {
             id = "selectedUser",
@@ -14,7 +14,7 @@
         })
     </div>
     <div class="col">
-        @Html.DropDownListFor(a => a.SelectedContest, new SelectList(Model.Contests, 1), "Zvoľte súťaž",
+        @Html.DropDownListFor(a => a.SelectedContest, new SelectList(Model.Contests, 1), "-- súťaž --",
         new
         {
             id = "selectedContest",
@@ -40,7 +40,7 @@
 
 <br />
 
-<table class="table table-striped">
+<table class="table table-striped table-responsive-sm">
     <thead class="thead-dark">
         <tr>
             <th style="width: 10%">

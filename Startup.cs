@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using QuizWebApp.Data;
 using Microsoft.Extensions.Configuration;
@@ -15,24 +11,17 @@ using Microsoft.Extensions.Hosting;
 using QuizWebApp.Models;
 using QuizWebApp.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Hangfire;
-using System.Timers;
-using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Http;
 
 namespace QuizWebApp
 {
     public class Startup
     {
-        private Timer myTimer;
-        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment hostEnvironment)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _hostEnvironment = hostEnvironment;
         }
 
         public IConfiguration Configuration { get; }
@@ -153,27 +142,3 @@ namespace QuizWebApp
         }
     }
 }
-
-
-/*
- * dotnet user-secrets set SendGridUser MENO
- * dotnet user-secrets set SendGridKey apiKey
- */
-
-//api key
-//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
-
-
-
-/*
-* secrets.json
-* 
-* {
-  "SendGridUser": "FRI QR Kvíz",
-  "SendGridKey": "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",
-
-  "Authentication:Facebook:AppId": "692703314556727",
-  "Authentication:Facebook:AppSecret": "98b9f547aefac841f5377ccef31d5705"
-}
-* 
-*/
