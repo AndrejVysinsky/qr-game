@@ -57,7 +57,7 @@
                         <h4>@Model.Contests[i].Name</h4>
                     </div>
                     <div>
-                        <button class="btn btn-light" data-toggle="collapse" data-target="#collapseTest" aria-expanded="false" aria-controls="collapseTest">
+                        <button class="btn btn-light" data-toggle="collapse" data-target="#collapseContest@(Model.Contests[i].Id)" aria-expanded="false" aria-controls="collapseContest@(Model.Contests[i].Id)">
                             <i class="fas fa-question"></i>
                         </button>
                     </div>
@@ -101,7 +101,7 @@
                     </div>
                 }
 
-                <div class="collapse" id="collapseTest">
+                <div class="collapse" id="collapseContest@(Model.Contests[i].Id)">
                     <br />
                     <div class="d-flex flex-wrap">
                         @for (int j = 0; j < Model.IndividualAnswers[i].Count; j++)
@@ -157,46 +157,92 @@
 {
     @if (!Model.Contests[i].IsActive)
     {
-        <div class="card-body contest-inactive">
-            <h4>@Model.Contests[i].Name</h4>
-
-            @if (Model.AnswersCount[i] == Model.Contests[i].ContestQuestions.Count)
-            {
-                <p>
-                    Výsledné skóre:
-                    <span class="font-weight-bold">
-                        @Model.CorrectAnswersCount[i]
-                    </span>
-                    /
-                    <span class="font-weight-bold">
-                        @Model.Contests[i].ContestQuestions.Count
-                    </span>
-                </p>
-
-                <div class="progress progress-inactive">
-                    <div class="progress-bar bg-success" role="progressbar"
-                         style="width: @((int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))%"
-                         aria-valuenow="@((int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))"
-                         aria-valuemin="0" aria-valuemax="100"></div>
-                    <div class="progress-bar bg-danger" role="progressbar"
-                         style="width: @(100 - (int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))%"
-                         aria-valuenow="@(100 - (int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))"
-                         aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="card col-md-9">
+            <div class="card-body contest-inactive">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>@Model.Contests[i].Name</h4>
+                    </div>
+                    <div>
+                        <button class="btn btn-light" data-toggle="collapse" data-target="#collapseContest@(Model.Contests[i].Id)" aria-expanded="false" aria-controls="collapseContest@(Model.Contests[i].Id)">
+                            <i class="fas fa-question"></i>
+                        </button>
+                    </div>
                 </div>
-            }
-            else
-            {
-                <p>
-                    Odpovedali ste na @Model.AnswersCount[i] z @Model.Contests[i].ContestQuestions.Count otázok
-                </p>
 
-                <div class="progress">
-                    <div class="progress-bar bg-info" role="progressbar"
-                         style="width: @((int)(((double)Model.AnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))%"
-                         aria-valuenow="@((int)(((double)Model.AnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))"
-                         aria-valuemin="0" aria-valuemax="100"></div>
+                @if (Model.AnswersCount[i] == Model.Contests[i].ContestQuestions.Count)
+                {
+                    <p>
+                        Výsledné skóre:
+                        <span class="font-weight-bold">
+                            @Model.CorrectAnswersCount[i]
+                        </span>
+                        /
+                        <span class="font-weight-bold">
+                            @Model.Contests[i].ContestQuestions.Count
+                        </span>
+                    </p>
+
+                    <div class="progress progress-inactive">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             style="width: @((int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))%"
+                             aria-valuenow="@((int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-danger" role="progressbar"
+                             style="width: @(100 - (int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))%"
+                             aria-valuenow="@(100 - (int)(((double)Model.CorrectAnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                }
+                else
+                {
+                    <p>
+                        Odpovedali ste na @Model.AnswersCount[i] z @Model.Contests[i].ContestQuestions.Count otázok
+                    </p>
+
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar"
+                             style="width: @((int)(((double)Model.AnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))%"
+                             aria-valuenow="@((int)(((double)Model.AnswersCount[i] / Model.Contests[i].ContestQuestions.Count) * 100))"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                }
+
+                <div class="collapse" id="collapseContest@(Model.Contests[i].Id)">
+                    <br />
+                    <div class="d-flex flex-wrap">
+                        @for (int j = 0; j < Model.IndividualAnswers[i].Count; j++)
+                        {
+                            <div class="card answerCard">
+                                <div class="card-body align-items-center d-flex justify-content-center">
+                                    @if (Model.AnswersCount[i] == Model.Contests[i].ContestQuestions.Count)
+                                    {
+                                        if (Model.IndividualAnswers[i][j] == QuizWebApp.ViewModels.AnswerEnum.Correct)
+                                        {
+                                            <span class="font-weight-bold text-success">@("#" + (j + 1))</span>
+                                        }
+                                        else if (Model.IndividualAnswers[i][j] == QuizWebApp.ViewModels.AnswerEnum.Incorrect)
+                                        {
+                                            <span class="font-weight-bold text-danger">@("#" + (j + 1))</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (Model.IndividualAnswers[i][j] == QuizWebApp.ViewModels.AnswerEnum.NotAnswered)
+                                        {
+                                            <i class="fas fa-question"></i>
+                                        }
+                                        else
+                                        {
+                                            <span class="font-weight-bold">@("#" + (j + 1))</span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
-            }
+            </div>
         </div>
     }
 }
@@ -204,26 +250,12 @@
 <script src="~/lib/qr-scanner/jsQR.js"></script>
 
 <script>
-    $(document).ready(function () {
-        $('#dataTable').DataTable({
-            "language": {
-                "lengthMenu": "",
-                "zeroRecords": "Nenašli sa žiadne záznamy",
-                "info": "",
-                "infoEmpty": "Žiadne dostupné záznamy",
-                "infoFiltered": "",
-                "search": "Hľadať",
-                "paginate": {
-                    "first": "Prvá",
-                    "last": "Posledná",
-                    "next": "Nasledujúca",
-                    "previous": "Predchádzajúca"
-                }
-            },
-            "ordering": false,
-            "searching": false
-        });
-    });
+
+    /*
+     *  Zdroj
+     *  https://cozmo.github.io/jsQR/
+     * 
+     * */
 
     var video = document.createElement("video");
     var canvasElement = document.getElementById("canvas");
@@ -252,15 +284,7 @@
 
     $('#collapseQRScanner').on('hide.bs.collapse', function () {
 
-        //zrusi stream ale ostane notifikacia o zapnutej kamere, preto bude asi lepsi reload stranky
-        /*
-        cancelAnimationFrame(tick);
-        video.pause();
-        video.srcObject.stop();
-
-        loadingMessage.hidden = false;
-        canvasElement.hidden = true;*/
-
+        //reaload stranky, kvoli zruseniu notifikacie o zapnutej kamere       
         location.reload();
     })
 
