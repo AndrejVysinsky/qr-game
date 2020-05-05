@@ -29,9 +29,13 @@ namespace QuizWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //var sqlServerConnection = Configuration.GetConnectionString("DefaultConnection");
+
+            var mySQLConnection = "server=localhost;database=library;user=user;password=password";
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Environment.GetEnvironmentVariable("DATABASE_CONN_STR") 
-                                        ?? Configuration.GetConnectionString("DefaultConnection")));
+                options.UseMySQL(Environment.GetEnvironmentVariable("DATABASE_CONN_STR") 
+                                        ?? mySQLConnection));
 
             services.AddDefaultIdentity<ApplicationUser>(options =>
             {
