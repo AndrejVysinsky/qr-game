@@ -4,6 +4,11 @@
     ViewData["Title"] = "Registrácia";
 }
 
+@*
+    ZDROJ:
+    https://bootsnipp.com/snippets/j6r4X
+*@
+
 <aside class="row justify-content-center">
     <div class="card col-11 col-sm-10 col-md-8 col-lg-6">
         <article class="card-body">
@@ -42,7 +47,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                         </div>
-                        <input asp-for="Input.Email" class="form-control" placeholder="Email" id="emailInput"/>
+                        <input asp-for="Input.Email" class="form-control" placeholder="Email" id="emailInput" />
                     </div>
                 </div>
 
@@ -77,7 +82,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-    <script type="text/javascript" language="JavaScript">        
+    <script type="text/javascript" language="JavaScript">
         $(document).ready(function () {
             $('#emailInput').on('change', function () {
                 var email = $("#emailInput").val();
