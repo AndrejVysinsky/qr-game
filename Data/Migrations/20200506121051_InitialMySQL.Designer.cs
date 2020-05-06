@@ -9,8 +9,8 @@ using QuizWebApp.Data;
 namespace QuizWebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200506113233_MySQL")]
-    partial class MySQL
+    [Migration("20200506121051_InitialMySQL")]
+    partial class InitialMySQL
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
