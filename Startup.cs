@@ -31,10 +31,10 @@ namespace QuizWebApp
         {
             //var sqlServerConnection = Configuration.GetConnectionString("DefaultConnection");
 
-            var mySQLConnection = "server=localhost;port=3306;database=friviaschema;user=root;password=password";
+            var mySQLConnection = "server=localhost;port=3306;database=testik;user=root;password=password";
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySQL(Environment.GetEnvironmentVariable("DATABASE_CONN_STR") 
+                options.UseMySql(Environment.GetEnvironmentVariable("DATABASE_CONN_STR") 
                                         ?? mySQLConnection));
 
             services.AddDefaultIdentity<ApplicationUser>(options =>
