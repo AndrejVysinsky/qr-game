@@ -135,16 +135,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
 
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code },
-                            protocol: Request.Scheme);
-
-                        await _emailSender.SendEmailAsync(Input.Email, "Potvrďte svoj email",
-                            $"Svoj účet si aktivujete kliknutím na nasledujúci <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>odkaz</a>.\n\n" +
-                            $"Prajeme veľa šťastia a správnych odpovedí. :)");
+                        await _userManager.ConfirmEmailAsync(user, code);
 
                         return LocalRedirect(returnUrl);
                     }
