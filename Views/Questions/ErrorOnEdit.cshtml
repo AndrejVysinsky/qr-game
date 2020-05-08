@@ -1,0 +1,45 @@
+﻿@model QuizWebApp.Models.Question
+
+@{
+    ViewData["Title"] = "ErrorOnEdit";
+}
+
+<div class="form-bg">
+
+    <h4>Upravenie otázky</h4>
+    <hr />
+    <div class="row">
+        <div class="col-5">
+            @Html.LabelFor(a => a.Name, new { @class = "font-weight-bold" })
+            @Html.TextBoxFor(a => a.Name, new { @class = "form-control", @disabled = "disabled" })
+        </div>
+    </div>
+    <br />
+    <div class="form-group">        
+        @Html.LabelFor(a => a.Text, new { @class = "font-weight-bold" })
+        @Html.TextAreaFor(a => a.Text, new { id = "questionTextArea"})
+    </div>
+
+    <form>
+        @Html.HiddenFor(a => a.Id)
+        <p class="text-danger font-weight-bold">Túto otázku nie je možné upraviť, pretože s ňou existujú záznamy o odpovediach.</p>
+        <p class="text-danger">
+            Ak ju aj napriek tomu chcete upraviť, musíte najprv
+            <input asp-action="DeleteUserAnswers" type="submit" class="btn btn-danger" value="vymazať údaje" formmethod="post"
+                   onclick="return confirm('Naozaj chcete vymazať odpovede ?')" />
+            o odpovediach.
+        </p>
+    </form>
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+</div>
+
+<script>
+    tinymce.init({
+        selector: '#questionTextArea',
+        readonly: 1
+    });
+</script>
+

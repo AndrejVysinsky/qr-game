@@ -133,6 +133,11 @@ namespace QuizWebApp.Controllers
             if (question == null)
                 return NotFound();
 
+            bool userAnswersExist = _context.ContestQuestionUsers.Include(cqu => cqu.ContestQuestion).Any(cqu => cqu.ContestQuestion.QuestionId == question.Id);
+
+            if (userAnswersExist)
+                return View("ErrorOnEdit", question);
+
             ClearTemps();
             //prekopiruj vsetky obrazky do tempu
             question = MoveFiles(question, true);
@@ -204,6 +209,22 @@ namespace QuizWebApp.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index", "Questions");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteUserAnswers(Question question)
+        {
+            var questionId = question.Id;
+
+            var contextQuestionUsersDb = _context.ContestQuestionUsers
+                                                .Include(cqu => cqu.ContestQuestion)
+                                                .Where(cqu => cqu.ContestQuestion.QuestionId == questionId)
+                                                .ToList();
+
+            _context.RemoveRange(contextQuestionUsersDb);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult Delete(int id)

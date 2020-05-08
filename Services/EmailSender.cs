@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using RestSharp;
+using RestSharp.Authenticators;
 using System.Threading.Tasks;
 
 namespace QuizWebApp.Services
@@ -21,8 +20,8 @@ namespace QuizWebApp.Services
 
             Options = new AuthMessageSenderOptions
             {
-                SendGridUser = Configuration["SendGrid:User"],
-                SendGridKey = Configuration["SendGrid:Key"]
+                MailGunDomain = Configuration["MailGun:Domain"],
+                MailGunKey = Configuration["MailGun:Key"]
             };
         }
 
@@ -31,24 +30,25 @@ namespace QuizWebApp.Services
 
         public Task SendEmailAsync(string email, string subject, string message)
         {
-            return Execute(Options.SendGridKey, subject, message, email);
+            SendSimpleMessage(Options.MailGunDomain, Options.MailGunKey, subject, message, email);
+            return Task.CompletedTask;
         }
 
-        public Task Execute(string apiKey, string subject, string message, string email)
+        public IRestResponse SendSimpleMessage(string domain, string apiKey, string subject, string message, string email)
         {
-            var client = new SendGridClient(apiKey);
-            var msg = new SendGridMessage()
-            {
-                From = new EmailAddress("no-reply@frivia.sk", Options.SendGridUser),
-                Subject = subject,
-                PlainTextContent = message,
-                HtmlContent = message
-            };
-            msg.AddTo(new EmailAddress(email));
+            RestClient client = new RestClient();
+            client.BaseUrl = new System.Uri("https://api.mailgun.net/v3");
+            client.Authenticator = new HttpBasicAuthenticator("api", apiKey);
 
-            msg.SetClickTracking(false, false);
-
-            return client.SendEmailAsync(msg);
+            RestRequest request = new RestRequest();
+            request.AddParameter("domain", domain, ParameterType.UrlSegment);
+            request.Resource = "{domain}/messages";
+            request.AddParameter("from", "FRIVIA <frivia@sandboxafce95efa6824f6cb346d844c985bcda.mailgun.org>");
+            request.AddParameter("to", email);
+            request.AddParameter("subject", subject);
+            request.AddParameter("text", message);
+            request.Method = Method.POST;
+            return client.Execute(request);
         }
     }
 }
