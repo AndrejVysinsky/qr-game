@@ -126,7 +126,7 @@ namespace QuizWebApp.Controllers
             return View("Details", question);
         }
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int id, bool forceedit)
         {
             var question = _context.Questions.Include(q => q.Answers).SingleOrDefault(q => q.Id == id);
             
@@ -135,7 +135,7 @@ namespace QuizWebApp.Controllers
 
             bool userAnswersExist = _context.ContestQuestionUsers.Include(cqu => cqu.ContestQuestion).Any(cqu => cqu.ContestQuestion.QuestionId == question.Id);
 
-            if (userAnswersExist)
+            if (userAnswersExist && !forceedit)
                 return View("ErrorOnEdit", question);
 
             ClearTemps();

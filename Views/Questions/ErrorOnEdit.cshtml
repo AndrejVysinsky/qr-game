@@ -22,12 +22,17 @@
 
     <form>
         @Html.HiddenFor(a => a.Id)
-        <p class="text-danger font-weight-bold">Túto otázku nie je možné upraviť, pretože s ňou existujú záznamy o odpovediach.</p>
+        <p class="text-danger font-weight-bold">Pre túto otázku existujú záznamy o odpovediach.</p>
         <p class="text-danger">
-            Ak ju aj napriek tomu chcete upraviť, musíte najprv
-            <input asp-action="DeleteUserAnswers" type="submit" class="btn btn-danger" value="vymazať údaje" formmethod="post"
+            Úprava otázky neovplyvní existujúce záznamy kým ich
+            <input asp-action="DeleteUserAnswers" type="submit" class="btn btn-danger" value="nevymažete" formmethod="post"
                    onclick="return confirm('Naozaj chcete vymazať odpovede ?')" />
-            o odpovediach.
+            a nevytvoríte nanovo.
+        </p>
+        <br />
+        <p>
+            Ak nechcete zasahovať do existujúcich záznamov môžete
+            <input asp-action="Edit" asp-route-id="@Model.Id" asp-route-forceedit="true" type="submit" class="btn btn-secondary" value="pokračovať s úpravami" formmethod="post"/>
         </p>
     </form>
 
