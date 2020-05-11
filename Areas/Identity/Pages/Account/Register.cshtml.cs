@@ -119,7 +119,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
 		
 		public async Task<IActionResult> OnPostAnonymous(string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/users/mycontests");
 
             int newID = GenerateGuestID();
             string guestEmail = "guest" + newID + "@frivia.sk";

@@ -28,8 +28,8 @@
 }
 
 <p>
-    <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseQRScanner" aria-expanded="false" aria-controls="collapseExample">
-        Naskenovanie QR kódu
+    <button id="qrbutton" class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseQRScanner" aria-expanded="false" aria-controls="collapseExample">
+        Naskenovať QR kód
     </button>
 </p>
 
@@ -273,6 +273,8 @@
 
     // Use facingMode: environment to attemt to get the front camera on phones
     $('#collapseQRScanner').on('show.bs.collapse', function () {
+        $('#qrbutton').text("Zastaviť skenovanie");
+
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function (stream) {
             videoStream = stream;
             video.srcObject = stream;
