@@ -60,7 +60,7 @@ namespace QuizWebApp.Areas.Identity.Pages.Account
                 await _emailSender.SendEmailAsync(
                     Input.Email,
                     "Obnovenie hesla",
-                    $"Resetnite si svoje heslo kliknutím na nasledujúci odkaz:\n\n {HtmlEncoder.Default.Encode(callbackUrl)}");
+                    $"Svoje heslo si môžete obnoviť kliknutím na nasledujúci odkaz:<br><br> {HtmlEncoder.Default.Encode(callbackUrl)}");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

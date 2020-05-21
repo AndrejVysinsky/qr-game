@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using RestSharp;
 using RestSharp.Authenticators;
+using System;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace QuizWebApp.Services
@@ -20,8 +23,10 @@ namespace QuizWebApp.Services
 
             Options = new AuthMessageSenderOptions
             {
-                MailGunDomain = Configuration["MailGun:Domain"],
-                MailGunKey = Configuration["MailGun:Key"]
+                Address = Environment.GetEnvironmentVariable("SMARTHOST_ADDRESS") ?? Configuration["SMTPGmail:Address"],
+                Port = Int32.Parse(Environment.GetEnvironmentVariable("SMARTHOST_PORT") ?? Configuration["SMTPGmail:Port"]),
+                User = Environment.GetEnvironmentVariable("SMARTHOST_USER") ?? Configuration["SMTPGmail:User"],
+                Password = Environment.GetEnvironmentVariable("SMARTHOST_PASSWORD") ?? Configuration["SMTPGmail:Password"]
             };
         }
 
@@ -30,25 +35,24 @@ namespace QuizWebApp.Services
 
         public Task SendEmailAsync(string email, string subject, string message)
         {
-            SendSimpleMessage(Options.MailGunDomain, Options.MailGunKey, subject, message, email);
+            SendMessage(Options.Address, Options.Port, Options.User, Options.Password, subject, message, email);
             return Task.CompletedTask;
         }
 
-        public IRestResponse SendSimpleMessage(string domain, string apiKey, string subject, string message, string email)
+        public void SendMessage(string address, int port, string user, string password, string subject, string messageBody, string recipient)
         {
-            RestClient client = new RestClient();
-            client.BaseUrl = new System.Uri("https://api.mailgun.net/v3");
-            client.Authenticator = new HttpBasicAuthenticator("api", apiKey);
+            using var message = new MailMessage();
+            message.To.Add(new MailAddress(recipient, recipient));
+            message.From = new MailAddress("info@frivia.uniza.sk", "FRIVIA");
+            message.Subject = subject;
+            message.Body = messageBody;
+            message.IsBodyHtml = true;
 
-            RestRequest request = new RestRequest();
-            request.AddParameter("domain", domain, ParameterType.UrlSegment);
-            request.Resource = "{domain}/messages";
-            request.AddParameter("from", "FRIVIA <frivia@sandboxafce95efa6824f6cb346d844c985bcda.mailgun.org>");
-            request.AddParameter("to", email);
-            request.AddParameter("subject", subject);
-            request.AddParameter("text", message);
-            request.Method = Method.POST;
-            return client.Execute(request);
+            using var client = new SmtpClient(address);
+            client.Port = port;
+            client.Credentials = new NetworkCredential(user, password);
+            client.EnableSsl = true;
+            client.Send(message);
         }
     }
 }

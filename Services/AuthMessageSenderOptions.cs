@@ -7,7 +7,9 @@ namespace QuizWebApp.Services
 {
     public class AuthMessageSenderOptions
     {
-        public string MailGunDomain { get; set; }
-        public string MailGunKey { get; set; }
+        public string Address { get; set; }
+        public int Port { get; set; }
+        public string User { get; set; }
+        public string Password { get; set; }
     }
 }
