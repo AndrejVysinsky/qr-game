@@ -261,26 +261,6 @@ namespace QuizWebApp.Controllers
 
             return RedirectToAction("Index");
         }
-
-        public ActionResult GenerateQRCodes(int id)
-        {
-            var questionIDs = _context.ContestQuestions.Include(q => q.Contest)
-                                                        .Where(q => q.ContestId == id)
-                                                        .OrderBy(q => q.QuestionNumber)
-                                                        .Select(q => q.Id)
-                                                        .ToList();
-
-            var urls = new List<string>(questionIDs.Count);
-            foreach(var questionID in questionIDs)
-            {
-                var actionUrl = Url.Action("QuestionForm", "Users", new { id = questionID });
-                var url = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{actionUrl}";
-                urls.Add(url);
-            }
-
-            return RedirectToAction("ViewQRCodes", "QRCoder", new { urls, contestId = id });
-        }
-
     }
 }
 

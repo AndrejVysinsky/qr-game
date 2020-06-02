@@ -27,7 +27,7 @@
                 <ul class="list-group">
                     @for (var i = 0; i < Model.SelectedQuestions.Count; i++)
                     {
-                        <li class="list-group-item">
+                        <li class="list-group-item selectedQuestion">
                             @Html.DisplayFor(a => a.SelectedQuestions[i].Key.Name)
                         </li>
                     }
@@ -48,11 +48,11 @@
         else
         {
             <div class="form-group d-flex justify-content-center">
-                <button asp-action="AddQuestion" type="submit" class="btn btn-dark" formmethod="post">
+                <button id="addQuestion" asp-action="AddQuestion" type="submit" class="btn btn-dark" formmethod="post">
                     <i class="fas fa-angle-up"></i>
                 </button>
                 <span class="col-1"></span>
-                <button asp-action="RemoveQuestion" type="submit" class="btn btn-dark" formmethod="post">
+                <button id="removeQuestion" asp-action="RemoveQuestion" type="submit" class="btn btn-dark" formmethod="post">
                     <i class="fas fa-angle-down"></i>
                 </button>
             </div>
@@ -65,7 +65,7 @@
                     <ul class="list-group list-group-all" id="questionList">
                         @for (var i = 0; i < Model.Questions.Count; i++)
                         {
-                            <li class="list-group-item">
+                            <li class="list-group-item notSelectedQuestion">
                                 @Html.DisplayFor(a => a.Questions[i].Name)
                             </li>
                         }
@@ -114,6 +114,15 @@
 </div>
 
 <script>
+    $(".list-group-item").on("dblclick", function () {
+        if ($(this).hasClass('notSelectedQuestion')) {
+            $("#addQuestion").trigger("click");
+        }
+        if ($(this).hasClass("selectedQuestion")) {
+            $("#removeQuestion").trigger("click");
+        }
+    });
+
     $(".list-group-item").on("click", function () {
         $(".list-group-item").removeClass('active');
         $(this).addClass('active');

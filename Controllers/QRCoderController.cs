@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using QuizWebApp.Data;
 using QuizWebApp.ViewModels;
@@ -19,10 +20,23 @@ namespace QuizWebApp.Controllers
         {
         }
 
-        public IActionResult ViewQRCodes(List<string> urls, int contestId)
+        public IActionResult ViewQRCodes(int contestId)
         {
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            var questionIDs = _context.ContestQuestions.Include(q => q.Contest)
+                                                        .Where(q => q.ContestId == contestId)
+                                                        .OrderBy(q => q.QuestionNumber)
+                                                        .Select(q => q.Id)
+                                                        .ToList();
 
+            var urls = new List<string>(questionIDs.Count);
+            foreach (var questionID in questionIDs)
+            {
+                var actionUrl = Url.Action("QuestionForm", "Users", new { id = questionID });
+                var url = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}{actionUrl}";
+                urls.Add(url);
+            }
+
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
             List<Byte[]> qrByteData = new List<Byte[]>();
 
             for (int i = 0; i < urls.Count; i++)

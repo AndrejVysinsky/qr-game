@@ -58,7 +58,7 @@
                 </td>
 
                 <td class="text-center" style="width: 20%">
-                    <a asp-action="GenerateQRCodes" asp-route-id="@Model.Entities[i].Id" target="_blank">Vygenerovať</a>
+                    <a asp-controller="QRCoder" asp-action="ViewQRCodes" asp-route-contestId="@Model.Entities[i].Id" target="_blank">Vygenerovať</a>
                 </td>
             </tr>
         }
