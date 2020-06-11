@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using QuizWebApp.Data;
@@ -227,8 +229,21 @@ namespace QuizWebApp.Controllers
 
                     row = excelSheet.CreateRow(2);
 
-                    //-----------------------------------
+                    //----------------------------------- toto by si zasluzilo refactor...
                     int rowNumber = 3;
+
+                    //sort userList based on correct question count in contest
+                    var contestAnswers = _context.ContestQuestionUsers.Include(cqu => cqu.ApplicationUser).Include(c => c.ContestQuestion).Where(c => c.ContestQuestion.ContestId == contest.Id);
+                    Dictionary<ApplicationUser, int> dict = new Dictionary<ApplicationUser, int>();
+
+                    for (int k = 0; k < userList.Count(); k++)
+                    {
+                        int correctCount = contestAnswers.Where(u => u.ApplicationUser.Email == userList[k].Email).Count(u => u.IsAnsweredCorrectly);
+
+                        dict.Add(userList[k], correctCount);
+                    }
+                    dict = dict.OrderByDescending(d => d.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+                    userList = dict.Keys.ToList();
                     
                     foreach (var user in userList)
                     {
@@ -240,7 +255,7 @@ namespace QuizWebApp.Controllers
                                                     .OrderBy(cqu => cqu.ContestQuestion.QuestionNumber)
                                                     .ToList();
 
-                        if (userAnswers.Count == 0)
+                        if (userAnswers.Count < contest.ContestQuestions.Count)
                             continue;
 
                         row.CreateCell(0).SetCellValue(user.Email);
@@ -271,16 +286,9 @@ namespace QuizWebApp.Controllers
                             i++;
                         }
 
-                        if (userAnswers.Count < contest.ContestQuestions.Count)
-                        {
-                            row.CreateCell(i + 1).SetCellValue("Nedokončil");
-                        }
-                        else
-                        {
-                            row.CreateCell(i + 1).SetCellValue(correctCount);
-                            row.CreateCell(i + 2).SetCellValue(Math.Round(((double)correctCount / contest.ContestQuestions.Count) * 100, 2));
-                        }
-
+                        row.CreateCell(i + 1).SetCellValue(correctCount);
+                        row.CreateCell(i + 2).SetCellValue(Math.Round(((double)correctCount / contest.ContestQuestions.Count) * 100, 2));
+                        
                         row = excelSheet.CreateRow(rowNumber);
                         rowNumber++;
                     }
