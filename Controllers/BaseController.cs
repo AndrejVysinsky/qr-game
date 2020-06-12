@@ -25,6 +25,7 @@ namespace QuizWebApp.Controllers
             var paginationViewModel = new PaginationViewModel<T>();
 
             paginationViewModel.Entities = query.Skip((pageNumber - 1) * pageLength).Take(pageLength).ToList();
+            paginationViewModel.Entities.Reverse();
             paginationViewModel.PageCount = (int)Math.Ceiling((double)query.Count() / pageLength);
 
             if (paginationViewModel.PageCount == 0)

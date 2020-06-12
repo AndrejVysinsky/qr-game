@@ -23,6 +23,7 @@ namespace QuizWebApp.Controllers
             var contestPaginationViewModel = new PaginationViewModel<Contest>();
 
             contestPaginationViewModel.Entities = _context.Contests.Take(contestPaginationViewModel.PageLength).ToList();
+            contestPaginationViewModel.Entities.Reverse();
             contestPaginationViewModel.PageCount = (int)Math.Ceiling((double)_context.Contests.Count() / contestPaginationViewModel.PageLength);
 
             return View(contestPaginationViewModel);

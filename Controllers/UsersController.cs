@@ -98,6 +98,7 @@ namespace QuizWebApp.Controllers
                                                     .Include(cqu => cqu.ContestQuestion.Question)
                                                     .Take(answersViewModel.PaginationViewModel.PageLength)
                                                     .ToList();
+            userAnswers.Reverse();
 
             var contests = _context.Contests.Select(c => c.Name).ToList();
             var users = _context.ApplicationUsers.Select(u => u.Email).ToList();
